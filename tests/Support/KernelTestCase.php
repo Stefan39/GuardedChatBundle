@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Stejac\GuardedChatBundle\Tests\Support;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
@@ -24,6 +25,7 @@ abstract class KernelTestCase extends TestCase
     protected function setUp(): void
     {
         FakeGateway::reset();
+        FakeRetriever::reset();
         $this->errorHandler = self::currentErrorHandler();
         $this->exceptionHandler = self::currentExceptionHandler();
     }
@@ -64,23 +66,39 @@ abstract class KernelTestCase extends TestCase
      * @param array<string, mixed>                  $bundleConfig
      * @param \Closure(ContainerBuilder): void|null $containerHook
      */
-    protected function boot(array $bundleConfig = [], ?\Closure $containerHook = null, bool $createSchema = true): Kernel
+    protected function boot(array $bundleConfig = [], ?\Closure $containerHook = null, bool $createSchema = true, ?string $databaseUrl = null): Kernel
     {
-        $this->kernel = new TestKernel($bundleConfig, $containerHook, $containerHook instanceof \Closure ? spl_object_hash($containerHook) : 'default');
-        $this->kernel->boot();
+        $kernel = new TestKernel($bundleConfig, $containerHook, $containerHook instanceof \Closure ? spl_object_hash($containerHook) : 'default', $databaseUrl);
+        $this->kernel = $kernel;
+        $kernel->boot();
 
         if ($createSchema) {
-            $em = $this->entityManager();
-            $em->getConnection()->executeStatement('PRAGMA foreign_keys = ON');
-            $metadata = $em->getMetadataFactory()->getAllMetadata();
-            (new SchemaTool($em))->createSchema($metadata);
-            // DBAL's SQLite platform drops the partial predicate from the unique index, which would
-            // forbid more than one inactive prompt. Recreate it the way PostgreSQL has it.
-            $em->getConnection()->executeStatement('DROP INDEX uniq_chat_prompt_active');
-            $em->getConnection()->executeStatement('CREATE UNIQUE INDEX uniq_chat_prompt_active ON chat_prompt (active) WHERE active = 1');
+            $this->createSchema();
         }
 
-        return $this->kernel;
+        return $kernel;
+    }
+
+    private function createSchema(): void
+    {
+        $em = $this->entityManager();
+        $connection = $em->getConnection();
+        $metadata = $em->getMetadataFactory()->getAllMetadata();
+
+        if ($connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $connection->executeStatement('DROP SCHEMA public CASCADE');
+            $connection->executeStatement('CREATE SCHEMA public');
+            (new SchemaTool($em))->createSchema($metadata);
+
+            return;
+        }
+
+        $connection->executeStatement('PRAGMA foreign_keys = ON');
+        (new SchemaTool($em))->createSchema($metadata);
+        // DBAL's SQLite platform drops the partial predicate from the unique index, which would
+        // forbid more than one inactive prompt. Recreate it the way PostgreSQL has it.
+        $connection->executeStatement('DROP INDEX uniq_chat_prompt_active');
+        $connection->executeStatement('CREATE UNIQUE INDEX uniq_chat_prompt_active ON chat_prompt (active) WHERE active = 1');
     }
 
     /**

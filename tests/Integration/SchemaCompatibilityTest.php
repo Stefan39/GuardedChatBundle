@@ -71,11 +71,31 @@ final class SchemaCompatibilityTest extends KernelTestCase
         ]), $this->describe('chat_prompt'));
     }
 
+    public function testChatKnowledgeSnippetMatchesTheExistingTable(): void
+    {
+        self::assertSame($this->sorted([
+            'columns' => [
+                'id' => ['type' => 'uuid', 'nullable' => false],
+                'title' => ['type' => 'string', 'nullable' => false, 'length' => 200],
+                'question' => ['type' => 'text', 'nullable' => true],
+                'content' => ['type' => 'text', 'nullable' => false],
+                'priority' => ['type' => 'smallint', 'nullable' => false, 'default' => 1],
+                'source_url' => ['type' => 'string', 'nullable' => true, 'length' => 500],
+                'active' => ['type' => 'boolean', 'nullable' => false, 'default' => true],
+                'source' => ['type' => 'string', 'nullable' => false, 'length' => 20],
+                'created_at' => ['type' => 'datetime_immutable', 'nullable' => false],
+                'updated_at' => ['type' => 'datetime_immutable', 'nullable' => false],
+            ],
+            'indexes' => ['idx_chat_knowledge_active' => ['columns' => ['active'], 'unique' => false, 'where' => null]],
+            'foreignKeys' => [],
+        ]), $this->describe('chat_knowledge_snippet'));
+    }
+
     public function testNoOtherTablesAreMapped(): void
     {
         $this->boot(createSchema: false);
 
-        self::assertSame(['chat_message', 'chat_prompt', 'chat_session'], $this->tableNames());
+        self::assertSame(['chat_knowledge_snippet', 'chat_message', 'chat_prompt', 'chat_session'], $this->tableNames());
     }
 
     /**

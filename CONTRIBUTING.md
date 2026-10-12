@@ -18,6 +18,11 @@ Thanks for taking the time! Issues and pull requests in English or German are we
    composer phpstan   # PHPStan max level
    composer cs        # php-cs-fixer (dry run)
    ```
+   The PostgreSQL tests (full-text search, generated DDL) are skipped unless `GUARDED_CHAT_TEST_DATABASE_URL` points at a throw-away database; the public schema is dropped on every boot:
+   ```bash
+   docker run -d --name guarded-chat-pg -e POSTGRES_PASSWORD=test -e POSTGRES_DB=guarded_chat_test -p 54329:5432 postgres:16-alpine
+   export GUARDED_CHAT_TEST_DATABASE_URL='postgresql://postgres:test@127.0.0.1:54329/guarded_chat_test?serverVersion=16&charset=utf8'
+   ```
 4. Keep PRs focused — one change per PR. Conventional Commits are appreciated (`fix: …`, `feat: …`).
 
 ## Code style
