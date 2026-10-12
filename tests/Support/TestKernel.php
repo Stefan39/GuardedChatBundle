@@ -46,6 +46,15 @@ final class TestKernel extends Kernel
         yield new GuardedChatBundle();
     }
 
+    /**
+     * Not the bundle root: a debug kernel writes `config/reference.php` into its project directory, and
+     * that generated file has no place in the bundle's own `config/`.
+     */
+    public function getProjectDir(): string
+    {
+        return sys_get_temp_dir().'/guarded-chat-bundle-tests/project';
+    }
+
     public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/guarded-chat-bundle-tests/'.$this->variant.'-'.md5(serialize($this->bundleConfig).__DIR__.$this->databaseUrl).'/cache';

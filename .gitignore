@@ -12,6 +12,7 @@
 
 # Test kernel output
 /var/
+/config/reference.php
 
 # Local environment
 .env
