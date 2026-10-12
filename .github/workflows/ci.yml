@@ -66,3 +66,14 @@ jobs:
       - uses: ramsey/composer-install@v3
       - run: composer phpstan
       - run: composer cs
+
+  js:
+    if: github.repository != 'Stefan39/php-repo-template'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test "tests/js/*.test.mjs"
+      - run: for f in assets/dist/*.js; do node --check "$f"; done

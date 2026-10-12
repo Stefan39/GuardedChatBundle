@@ -1,0 +1,26 @@
+{
+    "name": "@stejac/guarded-chat-bundle",
+    "description": "Chat widget (Stimulus controller) for GuardedChatBundle, guardrails for public AI chats in Symfony apps.",
+    "license": "MIT",
+    "version": "1.0.0",
+    "repository": "https://github.com/Stefan39/GuardedChatBundle",
+    "symfony": {
+        "controllers": {
+            "widget": {
+                "main": "dist/controller.js",
+                "webpackMode": "eager",
+                "fetch": "lazy",
+                "enabled": true,
+                "autoimport": {
+                    "@stejac/guarded-chat-bundle/dist/widget.css": true
+                }
+            }
+        },
+        "importmap": {
+            "@hotwired/stimulus": "^3.2.2"
+        }
+    },
+    "peerDependencies": {
+        "@hotwired/stimulus": "^3.0.0"
+    }
+}

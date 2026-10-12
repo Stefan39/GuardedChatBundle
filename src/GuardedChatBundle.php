@@ -19,6 +19,7 @@ use Stejac\GuardedChatBundle\Knowledge\PostgresFullTextRetriever;
 use Stejac\GuardedChatBundle\Prefilter\PrefilterInputProcessor;
 use Stejac\GuardedChatBundle\Scheduler\ChatRetentionSchedule;
 use Symfony\AI\Agent\Agent;
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -212,6 +213,14 @@ final class GuardedChatBundle extends AbstractBundle
     {
         $bundles = $builder->getParameter('kernel.bundles');
         \assert(\is_array($bundles));
+
+        // The widget's JavaScript and CSS ship in assets/dist; AssetMapper serves them under this
+        // package name, which is also what the Stimulus controller map refers to.
+        if (interface_exists(AssetMapperInterface::class)) {
+            $container->extension('framework', ['asset_mapper' => ['paths' => [
+                __DIR__.'/../assets/dist' => '@stejac/guarded-chat-bundle/dist',
+            ]]]);
+        }
 
         if (isset($bundles['DoctrineBundle'])) {
             $container->extension('doctrine', ['orm' => ['mappings' => ['GuardedChat' => [

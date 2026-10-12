@@ -17,3 +17,18 @@ prefilter:
     reply: 'I cannot help with that here. Please ask something related to the topic of this chat.'
 prompt:
     ai_transparency: 'You are an AI assistant, not a human. When asked whether you are a human or an AI, or who the person is talking to, always answer truthfully that you are an AI assistant. Never pose as a real person and never claim to be human.'
+widget:
+    launcher_open: 'Open AI chat'
+    panel_label: 'Chat with the AI assistant'
+    panel_title: 'AI assistant'
+    notice: 'You are chatting with an AI, not a person. Answers may contain errors.'
+    greeting: 'Hi, I am an AI assistant. How can I help?'
+    close: 'Close chat'
+    typing: 'Typing …'
+    input_label: 'Message'
+    input_placeholder: 'Your question …'
+    send: 'Send'
+    honeypot_label: 'Please leave empty'
+    error_generic: 'Sorry, something went wrong.'
+    error_session_expired: 'Your session has expired. Please send the message again.'
+    error_unavailable: 'The chat is currently unavailable.'

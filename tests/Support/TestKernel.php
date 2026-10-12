@@ -9,6 +9,7 @@ use Stejac\GuardedChatBundle\GuardedChatBundle;
 use Symfony\AI\Platform\Bridge\Generic\Factory;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -43,6 +44,7 @@ final class TestKernel extends Kernel
     {
         yield new FrameworkBundle();
         yield new DoctrineBundle();
+        yield new TwigBundle();
         yield new GuardedChatBundle();
     }
 
@@ -76,6 +78,11 @@ final class TestKernel extends Kernel
                 if ($container->hasDefinition('cache.rate_limiter')) {
                     $container->getDefinition('cache.rate_limiter')->clearTag('kernel.reset');
                 }
+                foreach (['twig', 'asset_mapper'] as $id) {
+                    if ($container->hasDefinition($id) || $container->hasAlias($id)) {
+                        $container->findDefinition($id)->setPublic(true);
+                    }
+                }
                 foreach ($container->getDefinitions() as $id => $definition) {
                     if (str_starts_with((string) $definition->getClass(), 'Stejac\\GuardedChatBundle\\') || str_starts_with($id, 'guarded_chat.') || str_starts_with($id, 'limiter.guarded_chat')) {
                         $definition->setPublic(true);
@@ -104,6 +111,7 @@ final class TestKernel extends Kernel
             'messenger' => ['enabled' => true],
             'cache' => ['pools' => ['cache.rate_limiter' => ['adapter' => 'cache.adapter.array']]],
         ]);
+        $container->extension('twig', ['strict_variables' => true]);
         $container->extension('doctrine', [
             'dbal' => null === $this->databaseUrl ? ['driver' => 'pdo_sqlite', 'memory' => true] : ['url' => $this->databaseUrl],
             'orm' => [],

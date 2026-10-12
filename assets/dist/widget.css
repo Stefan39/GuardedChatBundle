@@ -1,0 +1,195 @@
+/*
+ * Neutral default styling for @GuardedChat/widget.html.twig. Everything is driven by custom
+ * properties, so a theme only needs to set a few of them:
+ *
+ *   .guarded-chat { --guarded-chat-accent: #0f766e; }
+ *
+ * Override the template instead if you want to bring your own markup and classes.
+ */
+.guarded-chat {
+    --guarded-chat-accent: #2563eb;
+    --guarded-chat-accent-text: #fff;
+    --guarded-chat-bg: #fff;
+    --guarded-chat-text: #111827;
+    --guarded-chat-muted: #4b5563;
+    --guarded-chat-border: #e5e7eb;
+    --guarded-chat-bubble: #f3f4f6;
+    --guarded-chat-radius: 0.75rem;
+
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 50;
+    font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--guarded-chat-text);
+}
+
+.guarded-chat__launcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--guarded-chat-accent);
+    color: var(--guarded-chat-accent-text);
+    box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
+    cursor: pointer;
+}
+
+.guarded-chat__launcher svg {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.guarded-chat__panel {
+    position: absolute;
+    right: 0;
+    bottom: 4.25rem;
+    left: auto;
+    width: 20rem;
+    max-width: 90vw;
+    height: 28rem;
+    max-height: 70vh;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--guarded-chat-border);
+    border-radius: var(--guarded-chat-radius);
+    background: var(--guarded-chat-bg);
+    color: var(--guarded-chat-text);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+}
+
+.guarded-chat__panel[open] {
+    display: flex;
+}
+
+.guarded-chat__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--guarded-chat-border);
+}
+
+.guarded-chat__title {
+    font-weight: 600;
+}
+
+.guarded-chat__notice {
+    margin: 0.125rem 0 0;
+    font-size: 0.75rem;
+    color: var(--guarded-chat-muted);
+}
+
+.guarded-chat__close {
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.guarded-chat__messages {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+}
+
+.guarded-chat__message {
+    max-width: 85%;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--guarded-chat-radius);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.guarded-chat__message--user {
+    align-self: flex-end;
+    background: var(--guarded-chat-accent);
+    color: var(--guarded-chat-accent-text);
+}
+
+.guarded-chat__message--assistant {
+    align-self: flex-start;
+    background: var(--guarded-chat-bubble);
+}
+
+.guarded-chat__link {
+    text-decoration: underline;
+}
+
+.guarded-chat__action {
+    display: flex;
+    width: fit-content;
+    margin-top: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    background: var(--guarded-chat-accent);
+    color: var(--guarded-chat-accent-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.guarded-chat__typing {
+    padding: 0 1rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--guarded-chat-muted);
+}
+
+.guarded-chat__form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-top: 1px solid var(--guarded-chat-border);
+}
+
+.guarded-chat__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--guarded-chat-border);
+    border-radius: 0.375rem;
+    background: var(--guarded-chat-bg);
+    color: inherit;
+    font: inherit;
+}
+
+.guarded-chat__send {
+    padding: 0.25rem 0.75rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: var(--guarded-chat-accent);
+    color: var(--guarded-chat-accent-text);
+    font: inherit;
+    cursor: pointer;
+}
+
+/* Kept off-screen instead of display:none, which honeypot-aware bots look for. */
+.guarded-chat__honeypot {
+    position: absolute;
+    top: 0;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    .guarded-chat {
+        --guarded-chat-bg: #111827;
+        --guarded-chat-text: #f9fafb;
+        --guarded-chat-muted: #9ca3af;
+        --guarded-chat-border: #374151;
+        --guarded-chat-bubble: #1f2937;
+    }
+}
