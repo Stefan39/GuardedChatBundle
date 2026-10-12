@@ -189,7 +189,7 @@ guarded_chat:
 
 ## Requirements
 
-PHP 8.3+, Symfony 7.4 or 8, Doctrine ORM 3, `symfony/ai` 0.14. The widget additionally needs `symfony/twig-bundle`, `symfony/asset-mapper` and `symfony/stimulus-bundle`.
+PHP 8.3+, Symfony 7.4 or 8, Doctrine ORM 3, `symfony/ai-bundle` 0.14 (installed with the bundle). The widget additionally needs `symfony/twig-bundle`, `symfony/asset-mapper` and `symfony/stimulus-bundle`.
 
 ## Development
 
