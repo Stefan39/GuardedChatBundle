@@ -1,0 +1,85 @@
+{
+    "name": "stejac/guarded-chat-bundle",
+    "description": "Guardrails for public AI chats in Symfony apps: prompt versioning, injection prefilter, kill switch, budget and rate limits, signed sessions, retention. Built on Symfony AI.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": [
+        "symfony",
+        "symfony-bundle",
+        "ai",
+        "chat",
+        "guardrails",
+        "llm",
+        "rate-limit"
+    ],
+    "homepage": "https://github.com/Stefan39/GuardedChatBundle",
+    "authors": [
+        {
+            "name": "Stefan Jacomeit",
+            "email": "stefan@jacomeit.de",
+            "homepage": "https://www.jacomeit.de"
+        }
+    ],
+    "require": {
+        "doctrine/doctrine-bundle": "^2.13 || ^3.0",
+        "doctrine/orm": "^3.3",
+        "php": ">=8.3",
+        "psr/clock": "^1.0",
+        "psr/log": "^3.0",
+        "symfony/ai-agent": "^0.14",
+        "symfony/ai-generic-platform": "^0.14",
+        "symfony/ai-platform": "^0.14",
+        "symfony/cache-contracts": "^3.5",
+        "symfony/clock": "^7.4 || ^8.0",
+        "symfony/config": "^7.4 || ^8.0",
+        "symfony/console": "^7.4 || ^8.0",
+        "symfony/dependency-injection": "^7.4 || ^8.0",
+        "symfony/doctrine-bridge": "^7.4 || ^8.0",
+        "symfony/framework-bundle": "^7.4 || ^8.0",
+        "symfony/http-client": "^7.4 || ^8.0",
+        "symfony/http-foundation": "^7.4 || ^8.0",
+        "symfony/http-kernel": "^7.4 || ^8.0",
+        "symfony/messenger": "^7.4 || ^8.0",
+        "symfony/rate-limiter": "^7.4 || ^8.0",
+        "symfony/routing": "^7.4 || ^8.0",
+        "symfony/translation-contracts": "^3.5",
+        "symfony/uid": "^7.4 || ^8.0"
+    },
+    "require-dev": {
+        "dragonmantank/cron-expression": "^3.4",
+        "friendsofphp/php-cs-fixer": "^3.75",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpunit/phpunit": "^12.0",
+        "symfony/browser-kit": "^7.4 || ^8.0",
+        "symfony/cache": "^7.4 || ^8.0",
+        "symfony/dom-crawler": "^7.4 || ^8.0",
+        "symfony/mime": "^7.4 || ^8.0",
+        "symfony/scheduler": "^7.4 || ^8.0",
+        "symfony/translation": "^7.4 || ^8.0",
+        "symfony/yaml": "^7.4 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Stejac\\GuardedChatBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Stejac\\GuardedChatBundle\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan analyse --memory-limit=1G",
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "suggest": {
+        "symfony/scheduler": "To prune expired chat sessions on a recurring schedule (guarded_chat.retention.schedule)",
+        "dragonmantank/cron-expression": "Needed by symfony/scheduler for cron expressions"
+    }
+}

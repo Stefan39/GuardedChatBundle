@@ -1,0 +1,10 @@
+includes:
+  - vendor/phpstan/phpstan-doctrine/extension.neon
+
+parameters:
+  level: max
+  paths:
+    - src
+    - tests
+  doctrine:
+    objectManagerLoader: tests/Support/phpstan-object-manager.php

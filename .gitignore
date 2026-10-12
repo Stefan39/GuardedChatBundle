@@ -1,0 +1,28 @@
+# Dependencies (libraries do not commit the lock file)
+/vendor/
+/composer.lock
+
+# Tool caches and reports
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/.phpstan.cache/
+/coverage/
+/coverage.xml
+/.phpunit.result.cache
+
+# Test kernel output
+/var/
+
+# Local environment
+.env
+.env.*.local
+.env.local
+
+# IDE and OS files
+/.idea/
+/.vscode/
+/.fleet/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
