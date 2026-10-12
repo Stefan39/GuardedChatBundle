@@ -1,31 +1,11 @@
 guarded_chat:
     enabled: '%env(bool:GUARDED_CHAT_ENABLED)%'
 
-    # Service id of the Symfony AI platform that answers, for example the generic bridge for an
-    # OpenAI-compatible gateway: ai.platform.generic.<name>
+    # Service id of the Symfony AI platform that answers (see symfony/ai-bundle),
+    # for example "ai.platform.generic.litellm" for an OpenAI-compatible gateway
     platform: ai.platform.generic.default
     model: your-model
 
     prompt:
-        # Fallback until a prompt version is stored in the database. Describe your assistant here.
+        # Used until a prompt version is stored in the database; describe your assistant here
         default: 'You are the assistant of this website. Answer only questions about its topic.'
-        # pinned_instructions:
-        #     - 'Answer in plain text without Markdown.'
-
-    # Markers the model may emit; each becomes an SSE "action" event and, in the widget, a button.
-    # actions:
-    #     contact:
-    #         marker: '[[contact]]'
-    #         instruction: 'When the visitor should get in touch, output [[contact]] as the final token.'
-
-    # session: { lifetime: 7200, idle_timeout: 1800, max_messages: 20, max_history: 6 }
-    # rate_limits:
-    #     session: { limit: 5, interval: '1 hour' }
-    #     message: { limit: 8, interval: '1 minute' }
-    #     message_daily: { limit: 50, interval: '1 day' }
-    # retention: { days: 90 }
-
-    # knowledge:
-    #     retriever: postgres_full_text   # needs PostgreSQL; default: none
-    #     text_search_config: english
-    #     subject: 'Your Company'
