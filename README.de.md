@@ -197,7 +197,7 @@ PHP 8.3+, Symfony 7.4 oder 8, Doctrine ORM 3, `symfony/ai` 0.14. Das Widget brau
 composer test      # PHPUnit
 composer phpstan   # PHPStan, höchste Stufe
 composer cs        # php-cs-fixer (Trockenlauf)
-node --test tests/js   # Widget-Helfer
+node --test "tests/js/*.test.mjs"   # Widget-Helfer
 ```
 
 Die PostgreSQL-Tests brauchen `GUARDED_CHAT_TEST_DATABASE_URL`, siehe [CONTRIBUTING.md](CONTRIBUTING.md).

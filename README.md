@@ -197,7 +197,7 @@ PHP 8.3+, Symfony 7.4 or 8, Doctrine ORM 3, `symfony/ai` 0.14. The widget additi
 composer test      # PHPUnit
 composer phpstan   # PHPStan, max level
 composer cs        # php-cs-fixer (dry run)
-node --test tests/js   # widget helpers
+node --test "tests/js/*.test.mjs"   # widget helpers
 ```
 
 The PostgreSQL tests need `GUARDED_CHAT_TEST_DATABASE_URL`, see [CONTRIBUTING.md](CONTRIBUTING.md).
