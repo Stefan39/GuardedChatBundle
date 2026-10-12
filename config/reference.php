@@ -921,6 +921,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         enabled?: bool|Param, // Default: true
  *         phrases?: list<scalar|Param|null>,
  *     },
+ *     knowledge?: array{
+ *         retriever?: scalar|Param|null, // Where answers get their knowledge from: "postgres_full_text" (needs PostgreSQL), the service id of your KnowledgeRetrieverInterface, or null for none. // Default: null
+ *         text_search_config?: scalar|Param|null, // PostgreSQL text search configuration used by the "postgres_full_text" retriever. // Default: "german"
+ *         max_snippets?: int|Param, // Most snippets that go into one answer; bounds the prompt size. // Default: 4
+ *         subject?: scalar|Param|null, // Whom or what the knowledge is about, named in the prompt block ("Verified information about <subject>"). // Default: null
+ *     },
  *     rate_limits?: array{
  *         session?: array{
  *             limit?: int|Param, // Default: 5
