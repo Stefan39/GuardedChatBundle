@@ -1,0 +1,14 @@
+error:
+    rate_limited_session: 'Sie haben in kurzer Zeit viele Chats gestartet. Bitte versuchen Sie es später noch einmal.'
+    rate_limited_message: 'Bitte etwas langsamer – versuchen Sie es in einer Minute noch einmal.'
+    rate_limited_daily: 'Sie haben das Tageslimit für diesen Chat erreicht. Morgen geht es weiter.'
+    message_limit_reached: 'Diese Unterhaltung hat ihr Limit erreicht. Ihre nächste Nachricht startet einen neuen Chat.'
+    budget_exhausted: 'Der Chat hat sein Tagesbudget erreicht. Bitte versuchen Sie es morgen wieder.'
+    verification_failed: 'Die Sicherheitsprüfung ist fehlgeschlagen. Bitte laden Sie die Seite neu und versuchen Sie es erneut.'
+    unavailable: 'Der Chat ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.'
+    unavailable_stream: 'Entschuldigung, der Chat ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.'
+    invalid_request: 'Die Anfrage war ungültig.'
+prefilter:
+    reply: 'Dazu kann ich hier leider nichts sagen. Bitte stellen Sie eine Frage zum Thema dieses Chats.'
+prompt:
+    ai_transparency: 'Du bist ein KI-Assistent, kein Mensch. Wenn du gefragt wirst, ob du ein Mensch oder eine KI bist oder mit wem die Person spricht, antworte immer wahrheitsgemäß, dass du ein KI-Assistent bist. Gib dich niemals als reale Person aus und behaupte niemals, ein Mensch zu sein.'
