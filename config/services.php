@@ -11,9 +11,14 @@ use Stejac\GuardedChatBundle\Guard\BudgetExhaustionDetectorInterface;
 use Stejac\GuardedChatBundle\Guard\ClientIdentifierResolverInterface;
 use Stejac\GuardedChatBundle\Http\ChatRateLimiter;
 use Stejac\GuardedChatBundle\Internal\AiStreamAdapter;
+use Stejac\GuardedChatBundle\Knowledge\ChatKnowledgeFormatter;
+use Stejac\GuardedChatBundle\Knowledge\KnowledgeRetrieverInterface;
+use Stejac\GuardedChatBundle\Knowledge\NullRetriever;
+use Stejac\GuardedChatBundle\Knowledge\PostgresFullTextRetriever;
 use Stejac\GuardedChatBundle\MessageHandler\PruneChatSessionsMessageHandler;
 use Stejac\GuardedChatBundle\Prefilter\OffTopicPrefilter;
 use Stejac\GuardedChatBundle\Prefilter\PrefilterInputProcessor;
+use Stejac\GuardedChatBundle\Repository\ChatKnowledgeSnippetRepository;
 use Stejac\GuardedChatBundle\Repository\ChatMessageRepository;
 use Stejac\GuardedChatBundle\Repository\ChatPromptRepository;
 use Stejac\GuardedChatBundle\Repository\ChatSessionRepository;
@@ -32,7 +37,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
-    foreach ([ChatSessionRepository::class, ChatMessageRepository::class, ChatPromptRepository::class] as $repository) {
+    foreach ([ChatSessionRepository::class, ChatMessageRepository::class, ChatPromptRepository::class, ChatKnowledgeSnippetRepository::class] as $repository) {
         $services->set($repository)->args([service('doctrine')])->tag('doctrine.repository_service');
     }
 
@@ -63,6 +68,16 @@ return static function (ContainerConfigurator $container): void {
         param('guarded_chat.action_instructions'),
     ]);
 
+    $services->set(NullRetriever::class);
+    $services->set(PostgresFullTextRetriever::class)->args([
+        service(ChatKnowledgeSnippetRepository::class),
+        param('guarded_chat.knowledge.text_search_config'),
+    ]);
+    $services->set(ChatKnowledgeFormatter::class)->args([
+        service(TranslatorInterface::class),
+        param('guarded_chat.knowledge.subject'),
+    ]);
+
     $services->set(OffTopicPrefilter::class)->args([param('guarded_chat.prefilter.phrases')]);
     $services->set(PrefilterInputProcessor::class)->args([service(OffTopicPrefilter::class)]);
 
@@ -79,6 +94,9 @@ return static function (ContainerConfigurator $container): void {
         service(ChatPromptProvider::class),
         service(TranslatorInterface::class),
         service(SessionLimits::class),
+        service(KnowledgeRetrieverInterface::class),
+        service(ChatKnowledgeFormatter::class),
+        param('guarded_chat.knowledge.max_snippets'),
         param('guarded_chat.action_markers'),
     ]);
 

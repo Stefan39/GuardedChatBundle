@@ -8,6 +8,11 @@ error:
     unavailable: 'Der Chat ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.'
     unavailable_stream: 'Entschuldigung, der Chat ist gerade nicht erreichbar. Bitte versuchen Sie es später erneut.'
     invalid_request: 'Die Anfrage war ungültig.'
+knowledge:
+    header: 'Gesicherte Informationen über %subject%. Stütze deine Antwort ausschließlich auf diese Angaben, wenn sie zur Frage passen, und erfinde nichts dazu. Passt nichts davon, sage ehrlich, dass du es nicht weißt.'
+    header_generic: 'Gesicherte Informationen. Stütze deine Antwort ausschließlich auf diese Angaben, wenn sie zur Frage passen, und erfinde nichts dazu. Passt nichts davon, sage ehrlich, dass du es nicht weißt.'
+    typical_question: '(Typische Frage: %question%)'
+    source: '[Quelle: %url%]'
 prefilter:
     reply: 'Dazu kann ich hier leider nichts sagen. Bitte stellen Sie eine Frage zum Thema dieses Chats.'
 prompt:

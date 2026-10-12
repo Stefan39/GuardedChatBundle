@@ -34,6 +34,7 @@ final class TestKernel extends Kernel
         private readonly array $bundleConfig = [],
         private readonly ?\Closure $containerHook = null,
         private readonly string $variant = 'default',
+        private readonly ?string $databaseUrl = null,
     ) {
         parent::__construct('test', true);
     }
@@ -45,9 +46,18 @@ final class TestKernel extends Kernel
         yield new GuardedChatBundle();
     }
 
+    /**
+     * Not the bundle root: a debug kernel writes `config/reference.php` into its project directory, and
+     * that generated file has no place in the bundle's own `config/`.
+     */
+    public function getProjectDir(): string
+    {
+        return sys_get_temp_dir().'/guarded-chat-bundle-tests/project';
+    }
+
     public function getCacheDir(): string
     {
-        return sys_get_temp_dir().'/guarded-chat-bundle-tests/'.$this->variant.'-'.md5(serialize($this->bundleConfig).__DIR__).'/cache';
+        return sys_get_temp_dir().'/guarded-chat-bundle-tests/'.$this->variant.'-'.md5(serialize($this->bundleConfig).__DIR__.$this->databaseUrl).'/cache';
     }
 
     public function getLogDir(): string
@@ -95,7 +105,7 @@ final class TestKernel extends Kernel
             'cache' => ['pools' => ['cache.rate_limiter' => ['adapter' => 'cache.adapter.array']]],
         ]);
         $container->extension('doctrine', [
-            'dbal' => ['driver' => 'pdo_sqlite', 'memory' => true],
+            'dbal' => null === $this->databaseUrl ? ['driver' => 'pdo_sqlite', 'memory' => true] : ['url' => $this->databaseUrl],
             'orm' => [],
         ]);
         $container->extension('guarded_chat', array_replace([

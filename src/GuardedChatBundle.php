@@ -13,6 +13,9 @@ use Stejac\GuardedChatBundle\Guard\HumanVerifierInterface;
 use Stejac\GuardedChatBundle\Guard\NullHumanVerifier;
 use Stejac\GuardedChatBundle\Guard\RateLimitBudgetExhaustionDetector;
 use Stejac\GuardedChatBundle\Guard\RequestClientIdentifierResolver;
+use Stejac\GuardedChatBundle\Knowledge\KnowledgeRetrieverInterface;
+use Stejac\GuardedChatBundle\Knowledge\NullRetriever;
+use Stejac\GuardedChatBundle\Knowledge\PostgresFullTextRetriever;
 use Stejac\GuardedChatBundle\Prefilter\PrefilterInputProcessor;
 use Stejac\GuardedChatBundle\Scheduler\ChatRetentionSchedule;
 use Symfony\AI\Agent\Agent;
@@ -42,6 +45,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
  *     actions: array<string, array{marker: string, instruction: string|null}>,
  *     prefilter: array{enabled: bool, phrases: list<string>},
  *     rate_limits: array{session: RateLimit, message: RateLimit, message_daily: RateLimit},
+ *     knowledge: array{retriever: string|null, text_search_config: non-empty-string, max_snippets: int, subject: string|null},
  *     retention: array{days: int, schedule: array{enabled: bool, name: string, cron: string, timezone: string, state_cache: string|null}},
  *     runtime_switch: string|null,
  *     human_verifier: string|null,
@@ -106,6 +110,18 @@ final class GuardedChatBundle extends AbstractBundle
         $prefilter->arrayNode('phrases')->scalarPrototype()->end()->defaultValue(self::defaultPhrases())
             ->info('Phrases that block a message before the model is called. Replaces the default list; matched as whole words, case-insensitive.')->end();
 
+        $knowledge = $root->arrayNode('knowledge')->addDefaultsIfNotSet()->children();
+        $knowledge->scalarNode('retriever')->defaultNull()
+            ->info('Where answers get their knowledge from: "postgres_full_text" (needs PostgreSQL), the service id of your KnowledgeRetrieverInterface, or null for none.')->end();
+        $knowledge->scalarNode('text_search_config')->defaultValue('german')->cannotBeEmpty()
+            ->validate()->ifTrue(static fn (mixed $value): bool => !\is_string($value) || 1 !== preg_match('/^[a-z_]+$/', $value))
+            ->thenInvalid('Must be the name of a PostgreSQL text search configuration, e.g. "german" or "english".')->end()
+            ->info('PostgreSQL text search configuration used by the "postgres_full_text" retriever.')->end();
+        $knowledge->integerNode('max_snippets')->defaultValue(4)->min(1)
+            ->info('Most snippets that go into one answer; bounds the prompt size.')->end();
+        $knowledge->scalarNode('subject')->defaultNull()
+            ->info('Whom or what the knowledge is about, named in the prompt block ("Verified information about <subject>").')->end();
+
         $limits = $root->arrayNode('rate_limits')->addDefaultsIfNotSet()->children();
         foreach (['session' => [5, '1 hour'], 'message' => [8, '1 minute'], 'message_daily' => [50, '1 day']] as $name => [$limit, $interval]) {
             $limits->arrayNode($name)->addDefaultsIfNotSet()->children()
@@ -151,6 +167,9 @@ final class GuardedChatBundle extends AbstractBundle
         $parameters->set('guarded_chat.action_instructions', array_filter(array_map(static fn (array $action): ?string => $action['instruction'], $config['actions'])));
         $parameters->set('guarded_chat.prefilter.enabled', $config['prefilter']['enabled']);
         $parameters->set('guarded_chat.prefilter.phrases', $config['prefilter']['phrases']);
+        $parameters->set('guarded_chat.knowledge.text_search_config', $config['knowledge']['text_search_config']);
+        $parameters->set('guarded_chat.knowledge.max_snippets', $config['knowledge']['max_snippets']);
+        $parameters->set('guarded_chat.knowledge.subject', $config['knowledge']['subject']);
         $parameters->set('guarded_chat.retention.days', $config['retention']['days']);
 
         $container->import('../config/services.php');
@@ -162,6 +181,13 @@ final class GuardedChatBundle extends AbstractBundle
             $config['model'],
             $config['prefilter']['enabled'] ? [service(PrefilterInputProcessor::class)] : [],
         ]);
+
+        $retriever = $config['knowledge']['retriever'];
+        $services->alias(KnowledgeRetrieverInterface::class, match ($retriever) {
+            null => NullRetriever::class,
+            'postgres_full_text' => PostgresFullTextRetriever::class,
+            default => $retriever,
+        });
 
         foreach (self::EXTENSION_POINTS as $key => [$interface, $default]) {
             $services->alias($interface, $config[$key] ?? $default);
