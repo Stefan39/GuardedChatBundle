@@ -8,7 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [1.0.2] - 2026-10-12
 
 ### Fixed
-- `%env(...)%` placeholders for typed options such as `enabled` (as used in the README and the Flex recipe) made the container fail with "Invalid type for path guarded_chat.enabled". The rate limiters are now derived from the raw configuration instead of a second pass through the full config tree.
+- `%env(...)%` placeholders for the `enabled` flag (as used in the README and the Flex recipe) made the container fail with "Invalid type for path guarded_chat.enabled". The rate limiters are now derived from the raw configuration instead of a second pass through the full config tree.
 - `symfony/translation` and `symfony/yaml` are required instead of only suggested through dev dependencies: the bundle ships YAML translations and needs a translator, so a fresh skeleton app failed on `cache:clear` right after `composer require`.
 
 ## [1.0.1] - 2026-10-12
