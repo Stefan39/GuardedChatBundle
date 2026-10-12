@@ -17,3 +17,18 @@ prefilter:
     reply: 'Dazu kann ich hier leider nichts sagen. Bitte stellen Sie eine Frage zum Thema dieses Chats.'
 prompt:
     ai_transparency: 'Du bist ein KI-Assistent, kein Mensch. Wenn du gefragt wirst, ob du ein Mensch oder eine KI bist oder mit wem die Person spricht, antworte immer wahrheitsgemäß, dass du ein KI-Assistent bist. Gib dich niemals als reale Person aus und behaupte niemals, ein Mensch zu sein.'
+widget:
+    launcher_open: 'KI-Chat öffnen'
+    panel_label: 'Chat mit dem KI-Assistenten'
+    panel_title: 'KI-Assistent'
+    notice: 'Sie chatten mit einer KI, nicht mit einem Menschen. Antworten können Fehler enthalten.'
+    greeting: 'Hallo, ich bin ein KI-Assistent. Wie kann ich helfen?'
+    close: 'Chat schließen'
+    typing: 'Schreibt …'
+    input_label: 'Nachricht'
+    input_placeholder: 'Ihre Frage …'
+    send: 'Senden'
+    honeypot_label: 'Bitte leer lassen'
+    error_generic: 'Entschuldigung, da ist etwas schiefgelaufen.'
+    error_session_expired: 'Ihre Sitzung ist abgelaufen. Bitte senden Sie die Nachricht erneut.'
+    error_unavailable: 'Der Chat ist derzeit nicht verfügbar.'
