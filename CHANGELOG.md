@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-12
+
+### Fixed
+- `%env(...)%` placeholders for the `enabled` flag (as used in the README and the Flex recipe) made the container fail with "Invalid type for path guarded_chat.enabled". The rate limiters are now derived from the raw configuration instead of a second pass through the full config tree.
+- `symfony/translation` and `symfony/yaml` are required instead of only suggested through dev dependencies: the bundle ships YAML translations and needs a translator, so a fresh skeleton app failed on `cache:clear` right after `composer require`.
+
 ## [1.0.1] - 2026-10-12
 
 ### Fixed
@@ -18,6 +24,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Chat widget: Stimulus controller (`assets/`, served by AssetMapper), overridable `@GuardedChat/widget.html.twig` with blocks, default stylesheet driven by CSS custom properties, English and German texts including the Art. 50 AI notice, a `verify` event as the hook for human verification, configurable action buttons.
 - README in English and German with demo GIF, a section on how the bundle relates to Symfony AI, and the Flex recipe sources under `docs/recipe/`.
 
-[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Stefan39/GuardedChatBundle/releases/tag/v1.0.0

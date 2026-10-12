@@ -43,8 +43,10 @@
         "symfony/messenger": "^7.4 || ^8.0",
         "symfony/rate-limiter": "^7.4 || ^8.0",
         "symfony/routing": "^7.4 || ^8.0",
+        "symfony/translation": "^7.4 || ^8.0",
         "symfony/translation-contracts": "^3.5",
-        "symfony/uid": "^7.4 || ^8.0"
+        "symfony/uid": "^7.4 || ^8.0",
+        "symfony/yaml": "^7.4 || ^8.0"
     },
     "require-dev": {
         "dragonmantank/cron-expression": "^3.4",
@@ -58,9 +60,7 @@
         "symfony/dom-crawler": "^7.4 || ^8.0",
         "symfony/mime": "^7.4 || ^8.0",
         "symfony/scheduler": "^7.4 || ^8.0",
-        "symfony/translation": "^7.4 || ^8.0",
-        "symfony/twig-bundle": "^7.4 || ^8.0",
-        "symfony/yaml": "^7.4 || ^8.0"
+        "symfony/twig-bundle": "^7.4 || ^8.0"
     },
     "autoload": {
         "psr-4": {
