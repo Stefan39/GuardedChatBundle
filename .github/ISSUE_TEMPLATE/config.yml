@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Stefan39/GuardedChatBundle/security/advisories/new
+    about: Please report security issues privately.
+  - name: Questions & ideas
+    url: https://github.com/Stefan39/GuardedChatBundle/discussions
+    about: Ask questions in Discussions.

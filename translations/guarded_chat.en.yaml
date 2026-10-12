@@ -1,0 +1,14 @@
+error:
+    rate_limited_session: 'You started a lot of chats in a short time. Please try again later.'
+    rate_limited_message: 'Please slow down and try again in a minute.'
+    rate_limited_daily: 'You have reached the daily limit for this chat. It continues tomorrow.'
+    message_limit_reached: 'This conversation has reached its limit. Your next message starts a new chat.'
+    budget_exhausted: 'The chat has reached its daily budget. Please try again tomorrow.'
+    verification_failed: 'The security check failed. Please reload the page and try again.'
+    unavailable: 'The chat is currently unavailable. Please try again later.'
+    unavailable_stream: 'Sorry, the chat is currently unavailable. Please try again later.'
+    invalid_request: 'The request was not valid.'
+prefilter:
+    reply: 'I cannot help with that here. Please ask something related to the topic of this chat.'
+prompt:
+    ai_transparency: 'You are an AI assistant, not a human. When asked whether you are a human or an AI, or who the person is talking to, always answer truthfully that you are an AI assistant. Never pose as a real person and never claim to be human.'
