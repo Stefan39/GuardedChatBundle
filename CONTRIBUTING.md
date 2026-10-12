@@ -34,3 +34,7 @@ Thanks for taking the time! Issues and pull requests in English or German are we
 ## Response times
 
 Issues are triaged within a few working days. Maintainer: [@Stefan39](https://github.com/Stefan39).
+
+## Install test
+
+`tests/install/run.sh 7.4` (or `8.0`) installs the bundle from your checkout into a fresh Flex skeleton, applies the recipe from `docs/recipe/` and checks that `cache:clear` succeeds and the routes are registered. CI runs it for both Symfony lines. Run it before changing dependencies, the configuration tree or the recipe.
