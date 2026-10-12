@@ -8,6 +8,11 @@ error:
     unavailable: 'The chat is currently unavailable. Please try again later.'
     unavailable_stream: 'Sorry, the chat is currently unavailable. Please try again later.'
     invalid_request: 'The request was not valid.'
+knowledge:
+    header: 'Verified information about %subject%. Base your answer solely on these details when they fit the question, and do not invent anything. If none of it fits, say honestly that you do not know.'
+    header_generic: 'Verified information. Base your answer solely on these details when they fit the question, and do not invent anything. If none of it fits, say honestly that you do not know.'
+    typical_question: '(Typical question: %question%)'
+    source: '[Source: %url%]'
 prefilter:
     reply: 'I cannot help with that here. Please ask something related to the topic of this chat.'
 prompt:

@@ -35,6 +35,29 @@ class ChatMessageRepository extends ServiceEntityRepository
         $em->flush();
     }
 
+    /**
+     * How often each knowledge snippet has been used in an answer, keyed by snippet id. Counted in PHP
+     * over the answers that carry snippet ids, which keeps it portable; retention bounds the row count.
+     *
+     * @return array<string, int>
+     */
+    public function countSnippetUsage(): array
+    {
+        $messages = $this->createQueryBuilder('m')
+            ->where('m.contextSnippetIds IS NOT NULL')
+            ->getQuery()
+            ->toIterable();
+
+        $usage = [];
+        foreach ($messages as $message) {
+            foreach ($message->getContextSnippetIds() ?? [] as $id) {
+                $usage[$id] = ($usage[$id] ?? 0) + 1;
+            }
+        }
+
+        return $usage;
+    }
+
     /** @return list<ChatMessage> */
     public function findForSession(ChatSession $session): array
     {

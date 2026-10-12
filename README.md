@@ -2,7 +2,7 @@
 
 Guardrails for public AI chats in Symfony apps: prompt versioning, injection prefilter, kill switch, budget and rate limits, signed sessions, retention. Built on Symfony AI.
 
-> **Status: v0.1 (core).** The knowledge base, the chat widget and the full documentation (English and German, with a demo) follow in later releases. The API may still change before 1.0.
+> **Status: v0.1 (core and knowledge base).** The chat widget and the full documentation (English and German, with a demo) follow in later releases. The API may still change before 1.0.
 
 ## What it adds on top of Symfony AI
 
@@ -80,6 +80,22 @@ Each is a service you point the matching configuration key at; the defaults are 
 | `human_verifier` | `HumanVerifierInterface` | lets everyone through |
 | `client_identifier_resolver` | `ClientIdentifierResolverInterface` | `Request::getClientIp()` |
 | `budget_exhaustion_detector` | `BudgetExhaustionDetectorInterface` | HTTP 429 means budget exhausted |
+| `knowledge.retriever` | `KnowledgeRetrieverInterface` | none (`NullRetriever`) |
+
+## Knowledge base
+
+Answers can draw on hand-curated snippets (`chat_knowledge_snippet`: title, optional typical question, content, priority, source URL). Snippets created as `admin` are active at once; snippets suggested as `api` stay dormant until a person activates them, so a visitor cannot steer what the assistant knows.
+
+```yaml
+guarded_chat:
+    knowledge:
+        retriever: postgres_full_text   # default: none (the bundle then runs on any database)
+        text_search_config: english      # PostgreSQL text search configuration, default "german"
+        max_snippets: 4                  # per answer; bounds the prompt size
+        subject: 'Acme Corp'             # "Verified information about Acme Corp." (optional)
+```
+
+`postgres_full_text` needs PostgreSQL. For any other store, implement `KnowledgeRetrieverInterface` (`retrieve(string $question, int $limit): list<KnowledgeSnippetInterface>`) and put its service id into `retriever`. The ids of the snippets that fed an answer are stored with it in `chat_message.context_snippet_ids`. The header wording is translatable in the `guarded_chat` domain (`knowledge.*`).
 
 ## Retention
 
@@ -92,6 +108,8 @@ composer test      # PHPUnit
 composer phpstan   # PHPStan, max level
 composer cs        # php-cs-fixer (dry run)
 ```
+
+The PostgreSQL tests need `GUARDED_CHAT_TEST_DATABASE_URL`, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
