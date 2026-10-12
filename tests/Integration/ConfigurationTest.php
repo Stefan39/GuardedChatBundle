@@ -25,6 +25,24 @@ final class ConfigurationTest extends KernelTestCase
         $this->boot(['platform' => '']);
     }
 
+    public function testEnvPlaceholdersAreAcceptedForTypedOptions(): void
+    {
+        putenv('GUARDED_CHAT_TEST_ENABLED=1');
+        putenv('GUARDED_CHAT_TEST_MESSAGE_LIMIT=3');
+
+        try {
+            $kernel = $this->boot([
+                'enabled' => '%env(bool:GUARDED_CHAT_TEST_ENABLED)%',
+                'rate_limits' => ['message' => ['limit' => '%env(int:GUARDED_CHAT_TEST_MESSAGE_LIMIT)%']],
+            ]);
+
+            self::assertTrue($kernel->getContainer()->getParameter('guarded_chat.enabled'));
+        } finally {
+            putenv('GUARDED_CHAT_TEST_ENABLED');
+            putenv('GUARDED_CHAT_TEST_MESSAGE_LIMIT');
+        }
+    }
+
     public function testSessionLimitsHaveSensibleDefaults(): void
     {
         $this->boot();

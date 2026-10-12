@@ -21,9 +21,7 @@ use Stejac\GuardedChatBundle\Scheduler\ChatRetentionSchedule;
 use Symfony\AI\Agent\Agent;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Symfony\Component\Scheduler\Schedule;
@@ -59,6 +57,9 @@ final class GuardedChatBundle extends AbstractBundle
     protected string $extensionAlias = 'guarded_chat';
 
     /** Extension points: configuration key => interface the key replaces the default implementation of. */
+    /** Rate limit name => [limit, interval]. */
+    private const array RATE_LIMIT_DEFAULTS = ['session' => [5, '1 hour'], 'message' => [8, '1 minute'], 'message_daily' => [50, '1 day']];
+
     private const array EXTENSION_POINTS = [
         'runtime_switch' => [ChatRuntimeSwitchInterface::class, AlwaysOnRuntimeSwitch::class],
         'human_verifier' => [HumanVerifierInterface::class, NullHumanVerifier::class],
@@ -124,7 +125,7 @@ final class GuardedChatBundle extends AbstractBundle
             ->info('Whom or what the knowledge is about, named in the prompt block ("Verified information about <subject>").')->end();
 
         $limits = $root->arrayNode('rate_limits')->addDefaultsIfNotSet()->children();
-        foreach (['session' => [5, '1 hour'], 'message' => [8, '1 minute'], 'message_daily' => [50, '1 day']] as $name => [$limit, $interval]) {
+        foreach (self::RATE_LIMIT_DEFAULTS as $name => [$limit, $interval]) {
             $limits->arrayNode($name)->addDefaultsIfNotSet()->children()
                 ->integerNode('limit')->defaultValue($limit)->min(1)->end()
                 ->scalarNode('interval')->defaultValue($interval)->cannotBeEmpty()->end()
@@ -233,16 +234,21 @@ final class GuardedChatBundle extends AbstractBundle
         }
 
         // The limiters are registered from this bundle's own configuration, so the defaults need no
-        // framework.rate_limiter block in the app.
-        $extension = $builder->getExtension('guarded_chat');
-        $configuration = $extension instanceof ConfigurationExtensionInterface ? $extension->getConfiguration([], $builder) : null;
-        if (null === $configuration) {
-            return;
+        // framework.rate_limiter block in the app. The raw configuration is read instead of being
+        // processed with the full tree: at this stage values such as %env(bool:...)% are still
+        // placeholders that typed nodes reject, and the framework resolves and validates them itself.
+        /** @var array<string, array{limit: mixed, interval: mixed}> $limits */
+        $limits = array_map(static fn (array $default): array => ['limit' => $default[0], 'interval' => $default[1]], self::RATE_LIMIT_DEFAULTS);
+        foreach ($builder->getExtensionConfig('guarded_chat') as $rawConfig) {
+            $overrides = \is_array($rawConfig['rate_limits'] ?? null) ? $rawConfig['rate_limits'] : [];
+            foreach (array_keys(self::RATE_LIMIT_DEFAULTS) as $name) {
+                $override = \is_array($overrides[$name] ?? null) ? $overrides[$name] : [];
+                $limits[$name] = [
+                    'limit' => $override['limit'] ?? $limits[$name]['limit'],
+                    'interval' => $override['interval'] ?? $limits[$name]['interval'],
+                ];
+            }
         }
-
-        /** @var Config $config */
-        $config = (new Processor())->processConfiguration($configuration, $builder->getExtensionConfig('guarded_chat'));
-        $limits = $config['rate_limits'];
         $container->extension('framework', ['rate_limiter' => [
             'guarded_chat_session' => ['policy' => 'sliding_window', 'limit' => $limits['session']['limit'], 'interval' => $limits['session']['interval']],
             'guarded_chat_message' => ['policy' => 'token_bucket', 'limit' => $limits['message']['limit'], 'rate' => ['interval' => $limits['message']['interval'], 'amount' => $limits['message']['limit']]],
