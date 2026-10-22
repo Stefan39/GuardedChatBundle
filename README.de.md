@@ -104,6 +104,16 @@ ai:
 | `actions` | Einträge `{type, label, url}`; unter Antworten mit dieser Aktion erscheint ein Button |
 | `verification_token` | Statisches Token für den Hook zur menschlichen Verifikation |
 | `max_message_length` | `maxlength` des Eingabefelds, Standard 500 |
+| `root_attributes` | Zusätzliche Attribute des Wurzel-Elements, über `{class: 'guarded-chat'}` gemergt; `true` setzt ein Attribut ohne Wert, `false` und `null` lassen es weg |
+| `user_message_class`, `assistant_message_class` | Klassen der Sprechblasen |
+
+**Nur bei aktivem Chat.** `chat_enabled()` prüft dieselben zwei Stufen wie der Session-Endpunkt (den Schalter `enabled` und deinen Runtime-Switch):
+
+```twig
+{% if chat_enabled() %}
+    {{ include('@GuardedChat/widget.html.twig') }}
+{% endif %}
+```
 
 **Gestaltung.** Das Standard-Aussehen ist ein kleines Stylesheet, gesteuert über CSS-Variablen; Flex lädt es, sonst `{{ asset('@stejac/guarded-chat-bundle/dist/widget.css') }}` einbinden:
 
@@ -111,17 +121,33 @@ ai:
 .guarded-chat { --guarded-chat-accent: #0f766e; --guarded-chat-radius: 0.25rem; }
 ```
 
-**Eigenes Markup.** Das Template erweitern und einen Block überschreiben (`launcher`, `header`, `notice`, `messages`, `actions`, `form`) oder die Datei nach `templates/bundles/GuardedChatBundle/widget.html.twig` kopieren. Der Controller verlässt sich nur auf die Attribute `data-…-target` und `data-action`, Tailwind-Klassen oder jedes andere Design funktionieren also. Die Klassen der Sprechblasen sind Werte am Controller (`user-class`, `assistant-class`).
+**Eigenes Markup.** Das Template erweitern und einen Block überschreiben (`launcher`, `header`, `notice`, `messages`, `actions`, `form`) oder die Datei nach `templates/bundles/GuardedChatBundle/widget.html.twig` kopieren. Der Controller verlässt sich nur auf die Attribute `data-…-target` und `data-action`, Tailwind-Klassen oder jedes andere Design funktionieren also. Die Variablen oben lassen sich auch im erweiternden Template setzen:
+
+```twig
+{% extends '@GuardedChat/widget.html.twig' %}
+
+{% set root_attributes = {class: 'guarded-chat', style: '--guarded-chat-accent: #0f766e'} %}
+{% set user_message_class = 'rounded-lg bg-teal-600 px-3 py-2 text-white self-end' %}
+{% set assistant_message_class = 'rounded-lg bg-gray-100 px-3 py-2' %}
+
+{% block launcher %}…{% endblock %}
+```
 
 **Menschliche Verifikation.** Das Widget löst vor dem Sessionstart ein `verify`-Event aus. Ein Listener liefert ein Token, das als `verificationToken` an `POST /session` geht und von deinem `HumanVerifierInterface` geprüft wird. Beispiel mit Cloudflare Turnstile (das Bundle hängt nicht davon ab):
 
 ```js
 document.addEventListener('stejac--guarded-chat-bundle--widget:verify', (event) => {
-    event.detail.provide(new Promise((resolve) => turnstile.render('#captcha', {
-        sitekey: '…', callback: resolve,
+    event.detail.provide(new Promise((resolve, reject) => turnstile.render('#captcha', {
+        sitekey: '…',
+        callback: resolve,
+        'error-callback': () => reject(Object.assign(new Error('Turnstile failed'), {
+            userMessage: 'Die Sicherheitsprüfung ist fehlgeschlagen. Bitte laden Sie die Seite neu.',
+        })),
     })));
 });
 ```
+
+Wird das Promise abgelehnt, zeigt das Widget den Grund an, wenn er ein String ist oder ein `userMessage` trägt, sonst den übersetzten Text `widget.error_verification`. Die Meldung eines einfachen `Error` erscheint nie im Widget, sie bleibt in der Konsole.
 
 ## Konfiguration
 
@@ -144,7 +170,7 @@ guarded_chat:
         session: { limit: 5, interval: '1 hour' }
         message: { limit: 8, interval: '1 minute' }
         message_daily: { limit: 50, interval: '1 day' }
-    retention: { days: 90 }
+    retention: { days: 90, log_level: info }
 ```
 
 ## Endpunkte
@@ -185,7 +211,7 @@ guarded_chat:
 
 ## Löschfristen
 
-`bin/console guarded-chat:prune` löscht Sessions, die älter als `retention.days` sind (Standard 90). Sind `symfony/scheduler` und `dragonmantank/cron-expression` installiert, registriert `retention.schedule.enabled: true` einen wiederkehrenden Prune.
+`bin/console guarded-chat:prune` löscht Sessions, die älter als `retention.days` sind (Standard 90). Sind `symfony/scheduler` und `dragonmantank/cron-expression` installiert, registriert `retention.schedule.enabled: true` einen wiederkehrenden Prune. Jeder Lauf schreibt einen Log-Eintrag mit der Zahl der gelöschten Sessions. `retention.log_level` (Standard `info`) nimmt jedes PSR-3-Level, damit auch ein Produktiv-Log, das erst ab `warning` speichert, den Lauf festhält.
 
 ## Voraussetzungen
 
