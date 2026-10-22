@@ -55,6 +55,21 @@ export function sessionRequestBody(verificationToken, honeypot, locale) {
     return { verificationToken, website: honeypot, locale };
 }
 
+// Text shown when the `verify` listener's token promise rejects. The listener may reject with the
+// text itself or with an error carrying a `userMessage`; a plain Error's message is technical and
+// never reaches the visitor.
+export function verificationErrorText(reason, fallback) {
+    if ('string' === typeof reason && '' !== reason) {
+        return reason;
+    }
+    if (null !== reason && 'object' === typeof reason
+        && 'string' === typeof reason.userMessage && '' !== reason.userMessage) {
+        return reason.userMessage;
+    }
+
+    return fallback;
+}
+
 // Validates state read back from sessionStorage, which visitors can edit freely via devtools.
 export function isStoredState(state) {
     return hasOnlyKeys(state, ['sessionStarted', 'messages', 'isOpen'])

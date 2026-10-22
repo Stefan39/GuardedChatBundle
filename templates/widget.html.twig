@@ -12,13 +12,19 @@
         notice        Text under the title, "this is an AI" by default
         actions       List of {type, label, url} rendered under answers that carry that action
         verification_token  Static token for POST /session; use the `verify` event for dynamic ones
+        root_attributes     Map of extra attributes for the root element, merged over {class: 'guarded-chat'};
+                            true renders a bare attribute, false and null leave it out. The controller's
+                            own data-controller and data-…-value attributes cannot be replaced.
+        user_message_class, assistant_message_class
+                            Classes of the message bubbles the controller renders
 
     To restyle, override the blocks below in your own template:
 
         {% extends '@GuardedChat/widget.html.twig' %}
         {% block launcher %}…{% endblock %}
 
-    or copy the file to templates/bundles/GuardedChatBundle/widget.html.twig. The controller only
+    The variables above can be set there too ({% set root_attributes = {…} %} outside the blocks).
+    Or copy the file to templates/bundles/GuardedChatBundle/widget.html.twig. The controller only
     relies on the data-…-target and data-action attributes, not on any class name.
 #}
 {% set controller = 'stejac--guarded-chat-bundle--widget' %}
@@ -36,14 +42,22 @@
     send: 'widget.send'|trans({}, 'guarded_chat', widget_locale),
     honeypot: 'widget.honeypot_label'|trans({}, 'guarded_chat', widget_locale),
 } %}
-<div class="guarded-chat"
+{# The blank lines after the attribute loop and the class values are intentional: Twig drops the
+   first newline after a tag, and without them the next attribute would join the line. #}
+{% set root_attributes = {class: 'guarded-chat'}|merge(root_attributes|default({})) %}
+<div{% for name, value in root_attributes %}{% if value is not same as(false) and value is not null and name matches '/^[A-Za-z_:][-A-Za-z0-9_:.]*$/' and name != 'data-controller' and not (name starts with 'data-' ~ controller ~ '-') %} {{ name }}{% if value is not same as(true) %}="{{ value }}"{% endif %}{% endif %}{% endfor %}
+
      data-controller="{{ controller }}"
      data-{{ controller }}-session-url-value="{{ session_url|default(path('guarded_chat_start_session')) }}"
      data-{{ controller }}-message-url-value="{{ message_url|default(path('guarded_chat_message')) }}"
      data-{{ controller }}-locale-value="{{ widget_locale }}"
      data-{{ controller }}-greeting-value="{{ t.greeting }}"
-     data-{{ controller }}-verification-token-value="{{ verification_token|default('') }}"
+     data-{{ controller }}-verification-token-value="{{ verification_token|default('') }}"{% if user_message_class is defined %}
+     data-{{ controller }}-user-class-value="{{ user_message_class }}"{% endif %}{% if assistant_message_class is defined %}
+     data-{{ controller }}-assistant-class-value="{{ assistant_message_class }}"{% endif %}
+
      data-{{ controller }}-error-generic-value="{{ 'widget.error_generic'|trans({}, 'guarded_chat', widget_locale) }}"
+     data-{{ controller }}-error-verification-value="{{ 'widget.error_verification'|trans({}, 'guarded_chat', widget_locale) }}"
      data-{{ controller }}-error-session-expired-value="{{ 'widget.error_session_expired'|trans({}, 'guarded_chat', widget_locale) }}"
      data-{{ controller }}-error-unavailable-value="{{ 'widget.error_unavailable'|trans({}, 'guarded_chat', widget_locale) }}">
     {% block launcher %}

@@ -6,6 +6,7 @@ namespace Stejac\GuardedChatBundle\Service;
 
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Stejac\GuardedChatBundle\Repository\ChatSessionRepository;
 
 /**
@@ -14,11 +15,13 @@ use Stejac\GuardedChatBundle\Repository\ChatSessionRepository;
  */
 final readonly class ChatSessionPruner
 {
+    /** @param LogLevel::* $logLevel level of the log entry each run writes */
     public function __construct(
         private ChatSessionRepository $sessions,
         private ClockInterface $clock,
         private LoggerInterface $logger,
         private int $retentionDays,
+        private string $logLevel = LogLevel::INFO,
     ) {
     }
 
@@ -28,7 +31,7 @@ final readonly class ChatSessionPruner
         $cutoff = $this->clock->now()->modify('-'.$this->retentionDays.' days');
         $deleted = $this->sessions->deleteCreatedBefore($cutoff);
 
-        $this->logger->info('Pruned chat sessions past retention', [
+        $this->logger->log($this->logLevel, 'Pruned chat sessions past retention', [
             'deleted' => $deleted,
             'cutoff' => $cutoff->format(\DATE_ATOM),
         ]);

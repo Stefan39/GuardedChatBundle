@@ -30,5 +30,6 @@ widget:
     send: 'Send'
     honeypot_label: 'Please leave empty'
     error_generic: 'Sorry, something went wrong.'
+    error_verification: 'The security check could not be completed. Please reload the page and try again.'
     error_session_expired: 'Your session has expired. Please send the message again.'
     error_unavailable: 'The chat is currently unavailable.'

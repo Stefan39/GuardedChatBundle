@@ -30,5 +30,6 @@ widget:
     send: 'Senden'
     honeypot_label: 'Bitte leer lassen'
     error_generic: 'Entschuldigung, da ist etwas schiefgelaufen.'
+    error_verification: 'Die Sicherheitsprüfung konnte nicht abgeschlossen werden. Bitte laden Sie die Seite neu und versuchen Sie es erneut.'
     error_session_expired: 'Ihre Sitzung ist abgelaufen. Bitte senden Sie die Nachricht erneut.'
     error_unavailable: 'Der Chat ist derzeit nicht verfügbar.'

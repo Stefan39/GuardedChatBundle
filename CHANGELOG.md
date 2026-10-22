@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-22
+
+### Added
+- `retention.log_level` sets the PSR-3 level of the log entry each prune run writes (default `info`), so production logs that keep only `warning` and above still record it.
+- `chat_enabled()` Twig function with the same two-stage check as the session endpoint, registered when Twig is installed.
+- A `verify` listener can reject its token promise with a string or an error carrying `userMessage`; the widget shows that text. Without one it shows the new `widget.error_verification` text instead of the generic error.
+- Widget template variables `root_attributes`, `user_message_class` and `assistant_message_class`, also settable in a template that extends `@GuardedChat/widget.html.twig`.
+
 ## [1.0.2] - 2026-10-12
 
 ### Fixed
@@ -24,7 +32,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Chat widget: Stimulus controller (`assets/`, served by AssetMapper), overridable `@GuardedChat/widget.html.twig` with blocks, default stylesheet driven by CSS custom properties, English and German texts including the Art. 50 AI notice, a `verify` event as the hook for human verification, configurable action buttons.
 - README in English and German with demo GIF, a section on how the bundle relates to Symfony AI, and the Flex recipe sources under `docs/recipe/`.
 
-[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Stefan39/GuardedChatBundle/releases/tag/v1.0.0

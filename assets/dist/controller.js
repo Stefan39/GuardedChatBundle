@@ -9,6 +9,7 @@ import {
     sessionRequestBody,
     shouldShowGreeting,
     splitSseRecords,
+    verificationErrorText,
 } from './state.js';
 
 class ChatSessionError extends Error {
@@ -25,7 +26,9 @@ class ChatSessionError extends Error {
  * Human verification: before a session starts, the controller dispatches a `verify` event. A
  * listener may call `event.detail.provide(tokenOrPromise)` to hand over a token (for example a
  * Turnstile or reCAPTCHA response), which is sent as `verificationToken` to POST /session.
- * Without a listener the static `verification-token` value (empty by default) is sent.
+ * Without a listener the static `verification-token` value (empty by default) is sent. If the
+ * promise rejects, the widget shows the rejection reason when it is a string or carries a
+ * `userMessage` string, otherwise the `error-verification` value.
  */
 export default class extends Controller {
     static targets = ['launcher', 'panel', 'messages', 'input', 'typing', 'honeypot', 'action'];
@@ -39,6 +42,7 @@ export default class extends Controller {
         userClass: { type: String, default: 'guarded-chat__message guarded-chat__message--user' },
         assistantClass: { type: String, default: 'guarded-chat__message guarded-chat__message--assistant' },
         errorGeneric: String,
+        errorVerification: String,
         errorSessionExpired: String,
         errorUnavailable: String,
     };
@@ -166,7 +170,17 @@ export default class extends Controller {
             },
         });
 
-        return null === provided ? this.verificationTokenValue : await provided;
+        if (null === provided) {
+            return this.verificationTokenValue;
+        }
+
+        try {
+            return await provided;
+        } catch (error) {
+            console.error('[guarded-chat] verification failed', error);
+            // Templates from 1.0 have no error-verification value; they keep the generic text.
+            throw new ChatSessionError(verificationErrorText(error, this.errorVerificationValue || this.errorGenericValue));
+        }
     }
 
     async streamReply(response) {

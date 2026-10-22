@@ -104,6 +104,16 @@ ai:
 | `actions` | `{type, label, url}` entries; a button is shown under answers that carry that action |
 | `verification_token` | Static token for the human verification hook |
 | `max_message_length` | Input `maxlength`, default 500 |
+| `root_attributes` | Extra attributes of the root element, merged over `{class: 'guarded-chat'}`; `true` renders a bare attribute, `false` and `null` leave it out |
+| `user_message_class`, `assistant_message_class` | Classes of the message bubbles |
+
+**Only while the chat is on.** `chat_enabled()` applies the same two-stage check as the session endpoint (the `enabled` flag and your runtime switch):
+
+```twig
+{% if chat_enabled() %}
+    {{ include('@GuardedChat/widget.html.twig') }}
+{% endif %}
+```
 
 **Styling.** The default look is a small stylesheet driven by CSS custom properties; Flex loads it, otherwise add `{{ asset('@stejac/guarded-chat-bundle/dist/widget.css') }}`:
 
@@ -111,17 +121,33 @@ ai:
 .guarded-chat { --guarded-chat-accent: #0f766e; --guarded-chat-radius: 0.25rem; }
 ```
 
-**Your own markup.** Extend the template and override a block (`launcher`, `header`, `notice`, `messages`, `actions`, `form`), or copy it to `templates/bundles/GuardedChatBundle/widget.html.twig`. The controller relies only on the `data-…-target` and `data-action` attributes, so Tailwind classes or any other design work. The bubble classes are values on the controller (`user-class`, `assistant-class`).
+**Your own markup.** Extend the template and override a block (`launcher`, `header`, `notice`, `messages`, `actions`, `form`), or copy it to `templates/bundles/GuardedChatBundle/widget.html.twig`. The controller relies only on the `data-…-target` and `data-action` attributes, so Tailwind classes or any other design work. The variables above can be set in the extending template as well:
+
+```twig
+{% extends '@GuardedChat/widget.html.twig' %}
+
+{% set root_attributes = {class: 'guarded-chat', style: '--guarded-chat-accent: #0f766e'} %}
+{% set user_message_class = 'rounded-lg bg-teal-600 px-3 py-2 text-white self-end' %}
+{% set assistant_message_class = 'rounded-lg bg-gray-100 px-3 py-2' %}
+
+{% block launcher %}…{% endblock %}
+```
 
 **Human verification.** The widget dispatches a `verify` event before it starts a session. A listener hands over a token, which is sent as `verificationToken` to `POST /session` and checked by your `HumanVerifierInterface`. Example with Cloudflare Turnstile (the bundle has no dependency on it):
 
 ```js
 document.addEventListener('stejac--guarded-chat-bundle--widget:verify', (event) => {
-    event.detail.provide(new Promise((resolve) => turnstile.render('#captcha', {
-        sitekey: '…', callback: resolve,
+    event.detail.provide(new Promise((resolve, reject) => turnstile.render('#captcha', {
+        sitekey: '…',
+        callback: resolve,
+        'error-callback': () => reject(Object.assign(new Error('Turnstile failed'), {
+            userMessage: 'The security check failed. Please reload the page.',
+        })),
     })));
 });
 ```
+
+If the promise rejects, the widget shows the reason when it is a string or carries a `userMessage`, otherwise the translated `widget.error_verification` text. The message of a plain `Error` is never shown, it stays in the console.
 
 ## Configuration
 
@@ -144,7 +170,7 @@ guarded_chat:
         session: { limit: 5, interval: '1 hour' }
         message: { limit: 8, interval: '1 minute' }
         message_daily: { limit: 50, interval: '1 day' }
-    retention: { days: 90 }
+    retention: { days: 90, log_level: info }
 ```
 
 ## Endpoints
@@ -185,7 +211,7 @@ guarded_chat:
 
 ## Retention
 
-`bin/console guarded-chat:prune` deletes sessions older than `retention.days` (default 90). With `symfony/scheduler` and `dragonmantank/cron-expression` installed, `retention.schedule.enabled: true` registers a recurring prune.
+`bin/console guarded-chat:prune` deletes sessions older than `retention.days` (default 90). With `symfony/scheduler` and `dragonmantank/cron-expression` installed, `retention.schedule.enabled: true` registers a recurring prune. Every run writes one log entry with the number of deleted sessions; `retention.log_level` (default `info`) takes any PSR-3 level, so a production log that keeps only `warning` and above still records it.
 
 ## Requirements
 

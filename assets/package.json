@@ -2,7 +2,7 @@
     "name": "@stejac/guarded-chat-bundle",
     "description": "Chat widget (Stimulus controller) for GuardedChatBundle, guardrails for public AI chats in Symfony apps.",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "repository": "https://github.com/Stefan39/GuardedChatBundle",
     "symfony": {
         "controllers": {
