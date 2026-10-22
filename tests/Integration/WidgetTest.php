@@ -64,6 +64,63 @@ final class WidgetTest extends KernelTestCase
         self::assertStringNotContainsString('<script>', $html);
     }
 
+    public function testTheRootKeepsItsDefaultMarkupWithoutOverrides(): void
+    {
+        $html = $this->render(['locale' => 'en']);
+
+        self::assertStringContainsString('<div class="guarded-chat"'."\n", $html);
+        self::assertStringNotContainsString('user-class-value', $html);
+        self::assertStringNotContainsString('assistant-class-value', $html);
+    }
+
+    public function testRootAttributesAreMergedOverTheDefaultClass(): void
+    {
+        $html = $this->render(['locale' => 'en', 'root_attributes' => [
+            'class' => 'guarded-chat brand',
+            'style' => '--guarded-chat-accent: #0f766e',
+            'data-turbo-permanent' => true,
+            'hidden' => false,
+            'title' => null,
+        ]]);
+
+        self::assertStringContainsString('<div class="guarded-chat brand" style="--guarded-chat-accent: #0f766e" data-turbo-permanent'."\n", $html);
+        self::assertStringNotContainsString('hidden', substr($html, 0, (int) strpos($html, '>')));
+        self::assertStringNotContainsString('title=', $html);
+    }
+
+    public function testRootAttributesAreEscaped(): void
+    {
+        $html = $this->render(['locale' => 'en', 'root_attributes' => ['data-x' => '"><script>alert(1)</script>', 'onclick x' => 'y']]);
+
+        self::assertStringNotContainsString('<script>', $html);
+        self::assertStringNotContainsString('onclick x=', $html);
+    }
+
+    public function testMessageClassesBecomeControllerValues(): void
+    {
+        $html = $this->render(['locale' => 'en', 'user_message_class' => 'bubble bubble--me', 'assistant_message_class' => 'bubble']);
+
+        self::assertStringContainsString('data-stejac--guarded-chat-bundle--widget-user-class-value="bubble bubble--me"', $html);
+        self::assertStringContainsString('data-stejac--guarded-chat-bundle--widget-assistant-class-value="bubble"', $html);
+    }
+
+    public function testAnExtendingTemplateCanSetRootAttributesAndMessageClasses(): void
+    {
+        $this->boot();
+
+        $html = $this->renderString(<<<'TWIG'
+            {% extends '@GuardedChat/widget.html.twig' %}
+            {% set locale = 'en' %}
+            {% set root_attributes = {class: 'guarded-chat brand'} %}
+            {% set user_message_class = 'me' %}
+            {% set assistant_message_class = 'bot' %}
+            TWIG);
+
+        self::assertStringContainsString('<div class="guarded-chat brand"', $html);
+        self::assertStringContainsString('user-class-value="me"', $html);
+        self::assertStringContainsString('assistant-class-value="bot"', $html);
+    }
+
     public function testChatEnabledIsTrueWhileBothStagesAreOn(): void
     {
         $this->boot();
