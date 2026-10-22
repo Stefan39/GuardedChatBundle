@@ -30,6 +30,7 @@ final class WidgetTest extends KernelTestCase
 
         self::assertStringContainsString('Sie chatten mit einer KI, nicht mit einem Menschen.', $html);
         self::assertStringContainsString('Hallo, ich bin ein KI-Assistent.', $html);
+        self::assertStringContainsString('error-verification-value="Die Sicherheitsprüfung konnte nicht abgeschlossen werden.', $html);
     }
 
     public function testNoticeAndGreetingCanBeOverridden(): void

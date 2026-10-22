@@ -9,6 +9,7 @@ import {
     parseSsePayload,
     shouldShowGreeting,
     splitSseRecords,
+    verificationErrorText,
 } from '../../assets/dist/state.js';
 
 test('shouldShowGreeting is true when both memory and DOM are empty', () => {
@@ -185,4 +186,25 @@ test('isStoredState rejects a state whose messages array contains an entry with 
 
 test('sessionRequestBody carries the verification token, honeypot and locale', () => {
     assert.deepEqual(sessionRequestBody('tok', '', 'de'), { verificationToken: 'tok', website: '', locale: 'de' });
+});
+
+test('verificationErrorText shows a string the verify listener rejected with', () => {
+    assert.equal(verificationErrorText('Bitte Werbeblocker deaktivieren.', 'fallback'), 'Bitte Werbeblocker deaktivieren.');
+});
+
+test('verificationErrorText shows the userMessage of a rejection reason', () => {
+    const reason = Object.assign(new Error('turnstile script failed'), { userMessage: 'Die Prüfung konnte nicht geladen werden.' });
+    assert.equal(verificationErrorText(reason, 'fallback'), 'Die Prüfung konnte nicht geladen werden.');
+});
+
+test('verificationErrorText never shows a technical Error message', () => {
+    assert.equal(verificationErrorText(new Error('turnstile script failed'), 'fallback'), 'fallback');
+});
+
+test('verificationErrorText falls back for empty or non-string messages', () => {
+    assert.equal(verificationErrorText('', 'fallback'), 'fallback');
+    assert.equal(verificationErrorText({ userMessage: '' }, 'fallback'), 'fallback');
+    assert.equal(verificationErrorText({ userMessage: 42 }, 'fallback'), 'fallback');
+    assert.equal(verificationErrorText(undefined, 'fallback'), 'fallback');
+    assert.equal(verificationErrorText(null, 'fallback'), 'fallback');
 });

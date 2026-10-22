@@ -44,6 +44,7 @@
      data-{{ controller }}-greeting-value="{{ t.greeting }}"
      data-{{ controller }}-verification-token-value="{{ verification_token|default('') }}"
      data-{{ controller }}-error-generic-value="{{ 'widget.error_generic'|trans({}, 'guarded_chat', widget_locale) }}"
+     data-{{ controller }}-error-verification-value="{{ 'widget.error_verification'|trans({}, 'guarded_chat', widget_locale) }}"
      data-{{ controller }}-error-session-expired-value="{{ 'widget.error_session_expired'|trans({}, 'guarded_chat', widget_locale) }}"
      data-{{ controller }}-error-unavailable-value="{{ 'widget.error_unavailable'|trans({}, 'guarded_chat', widget_locale) }}">
     {% block launcher %}
