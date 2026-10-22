@@ -126,6 +126,7 @@ return static function (ContainerConfigurator $container): void {
         service(ClockInterface::class),
         service(LoggerInterface::class),
         param('guarded_chat.retention.days'),
+        param('guarded_chat.retention.log_level'),
     ]);
     $services->set(PruneChatSessionsMessageHandler::class)->args([service(ChatSessionPruner::class)])->autoconfigure();
     $services->set(PruneChatSessionsCommand::class)->args([service(ChatSessionPruner::class)])->autoconfigure();

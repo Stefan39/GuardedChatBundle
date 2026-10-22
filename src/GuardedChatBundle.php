@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Stejac\GuardedChatBundle;
 
 use Cron\CronExpression;
+use Psr\Log\LogLevel;
 use Stejac\GuardedChatBundle\Guard\AlwaysOnRuntimeSwitch;
 use Stejac\GuardedChatBundle\Guard\BudgetExhaustionDetectorInterface;
 use Stejac\GuardedChatBundle\Guard\ChatRuntimeSwitchInterface;
@@ -45,7 +46,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
  *     prefilter: array{enabled: bool, phrases: list<string>},
  *     rate_limits: array{session: RateLimit, message: RateLimit, message_daily: RateLimit},
  *     knowledge: array{retriever: string|null, text_search_config: non-empty-string, max_snippets: int, subject: string|null},
- *     retention: array{days: int, schedule: array{enabled: bool, name: string, cron: string, timezone: string, state_cache: string|null}},
+ *     retention: array{days: int, log_level: string, schedule: array{enabled: bool, name: string, cron: string, timezone: string, state_cache: string|null}},
  *     runtime_switch: string|null,
  *     human_verifier: string|null,
  *     client_identifier_resolver: string|null,
@@ -59,6 +60,8 @@ final class GuardedChatBundle extends AbstractBundle
     /** Extension points: configuration key => interface the key replaces the default implementation of. */
     /** Rate limit name => [limit, interval]. */
     private const array RATE_LIMIT_DEFAULTS = ['session' => [5, '1 hour'], 'message' => [8, '1 minute'], 'message_daily' => [50, '1 day']];
+
+    private const array LOG_LEVELS = [LogLevel::DEBUG, LogLevel::INFO, LogLevel::NOTICE, LogLevel::WARNING, LogLevel::ERROR, LogLevel::CRITICAL, LogLevel::ALERT, LogLevel::EMERGENCY];
 
     private const array EXTENSION_POINTS = [
         'runtime_switch' => [ChatRuntimeSwitchInterface::class, AlwaysOnRuntimeSwitch::class],
@@ -134,6 +137,8 @@ final class GuardedChatBundle extends AbstractBundle
 
         $retention = $root->arrayNode('retention')->addDefaultsIfNotSet()->children();
         $retention->integerNode('days')->defaultValue(90)->min(1)->info('Sessions and their messages are deleted after this many days.')->end();
+        $retention->enumNode('log_level')->values(self::LOG_LEVELS)->defaultValue(LogLevel::INFO)
+            ->info('PSR-3 level of the log entry each prune run writes; raise it if your production log drops info.')->end();
         $schedule = $retention->arrayNode('schedule')->addDefaultsIfNotSet()->children();
         $schedule->booleanNode('enabled')->defaultFalse()->info('Register a recurring prune on a Symfony Scheduler schedule.')->end();
         $schedule->scalarNode('name')->defaultValue('default')->info('Name of the schedule to add the prune to.')->end();
@@ -173,6 +178,7 @@ final class GuardedChatBundle extends AbstractBundle
         $parameters->set('guarded_chat.knowledge.max_snippets', $config['knowledge']['max_snippets']);
         $parameters->set('guarded_chat.knowledge.subject', $config['knowledge']['subject']);
         $parameters->set('guarded_chat.retention.days', $config['retention']['days']);
+        $parameters->set('guarded_chat.retention.log_level', $config['retention']['log_level']);
 
         $container->import('../config/services.php');
 

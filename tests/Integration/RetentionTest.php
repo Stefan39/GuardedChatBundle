@@ -13,6 +13,7 @@ use Stejac\GuardedChatBundle\Repository\ChatSessionRepository;
 use Stejac\GuardedChatBundle\Scheduler\ChatRetentionSchedule;
 use Stejac\GuardedChatBundle\Tests\Support\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Uid\Uuid;
 
@@ -51,6 +52,28 @@ final class RetentionTest extends KernelTestCase
 
         $this->entityManager()->clear();
         self::assertCount(2, $this->service(ChatSessionRepository::class)->findAll());
+    }
+
+    public function testThePruneRunLogsOnInfoByDefault(): void
+    {
+        $kernel = $this->boot();
+
+        self::assertSame('info', $kernel->getContainer()->getParameter('guarded_chat.retention.log_level'));
+    }
+
+    public function testTheLogLevelOfThePruneRunIsConfigurable(): void
+    {
+        $kernel = $this->boot(['retention' => ['log_level' => 'warning']]);
+
+        self::assertSame('warning', $kernel->getContainer()->getParameter('guarded_chat.retention.log_level'));
+    }
+
+    public function testAnUnknownLogLevelIsRejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/guarded_chat\.retention\.log_level/');
+
+        $this->boot(['retention' => ['log_level' => 'loud']]);
     }
 
     public function testNoScheduleIsRegisteredByDefault(): void
