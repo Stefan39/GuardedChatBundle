@@ -19,6 +19,8 @@ use Stejac\GuardedChatBundle\Knowledge\NullRetriever;
 use Stejac\GuardedChatBundle\Knowledge\PostgresFullTextRetriever;
 use Stejac\GuardedChatBundle\Prefilter\PrefilterInputProcessor;
 use Stejac\GuardedChatBundle\Scheduler\ChatRetentionSchedule;
+use Stejac\GuardedChatBundle\Service\ChatAvailability;
+use Stejac\GuardedChatBundle\Twig\GuardedChatExtension;
 use Symfony\AI\Agent\Agent;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -26,6 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Symfony\Component\Scheduler\Schedule;
+use Twig\Extension\AbstractExtension;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
@@ -189,6 +192,11 @@ final class GuardedChatBundle extends AbstractBundle
             $config['model'],
             $config['prefilter']['enabled'] ? [service(PrefilterInputProcessor::class)] : [],
         ]);
+
+        if (class_exists(AbstractExtension::class)) {
+            $services->set(GuardedChatExtension::class)->tag('twig.extension');
+            $services->get(ChatAvailability::class)->tag('twig.runtime');
+        }
 
         $retriever = $config['knowledge']['retriever'];
         $services->alias(KnowledgeRetrieverInterface::class, match ($retriever) {

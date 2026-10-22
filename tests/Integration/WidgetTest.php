@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Stejac\GuardedChatBundle\Tests\Integration;
 
 use Stejac\GuardedChatBundle\Tests\Support\KernelTestCase;
+use Stejac\GuardedChatBundle\Tests\Support\OffSwitch;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Twig\Environment;
 
 final class WidgetTest extends KernelTestCase
@@ -61,6 +63,29 @@ final class WidgetTest extends KernelTestCase
         self::assertStringNotContainsString('<script>', $html);
     }
 
+    public function testChatEnabledIsTrueWhileBothStagesAreOn(): void
+    {
+        $this->boot();
+
+        self::assertSame('on', $this->renderString("{{ chat_enabled() ? 'on' : 'off' }}"));
+    }
+
+    public function testChatEnabledFollowsTheConfigurationFlag(): void
+    {
+        $this->boot(['enabled' => false]);
+
+        self::assertSame('off', $this->renderString("{{ chat_enabled() ? 'on' : 'off' }}"));
+    }
+
+    public function testChatEnabledFollowsTheRuntimeSwitch(): void
+    {
+        $this->boot(['runtime_switch' => 'test.off_switch'], static function (ContainerBuilder $builder): void {
+            $builder->register('test.off_switch', OffSwitch::class);
+        });
+
+        self::assertSame('off', $this->renderString("{{ chat_enabled() ? 'on' : 'off' }}"));
+    }
+
     public function testBundleAssetsAreServedByAssetMapper(): void
     {
         $this->boot();
@@ -69,6 +94,13 @@ final class WidgetTest extends KernelTestCase
         foreach (['controller.js', 'state.js', 'link_parser.js', 'plain_text.js', 'widget.css'] as $file) {
             self::assertNotNull($mapper->getAsset('@stejac/guarded-chat-bundle/dist/'.$file), $file);
         }
+    }
+
+    private function renderString(string $template): string
+    {
+        $twig = $this->service(Environment::class);
+
+        return $twig->createTemplate($template)->render();
     }
 
     /** @param array<string, mixed> $context */
