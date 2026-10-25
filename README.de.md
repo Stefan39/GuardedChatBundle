@@ -58,6 +58,8 @@ guarded_chat:
 
 Mehr ist für die Einbindung nicht nötig. Das Widget braucht AssetMapper mit dem Symfony-UX-StimulusBundle (`composer require symfony/asset-mapper symfony/stimulus-bundle`); Flex registriert den Controller automatisch. Das Bundle registriert sein Doctrine-Mapping, liefert aber **keine Migrationen**: `bin/console doctrine:migrations:diff` ausführen und das Ergebnis prüfen.
 
+Fehlt der Eintrag `@stejac/guarded-chat-bundle` in `assets/controllers.json` nach einem Composer-Update, kommst du von einer Version ohne das Schlüsselwort `symfony-ux` (vor v1.1.1), und Flex hat den Eintrag entfernt. Trage ihn von Hand wieder ein oder führe `composer update stejac/guarded-chat-bundle` aus, sobald das Release mit dem Schlüsselwort installiert ist; danach behält Flex den Eintrag.
+
 Mit [Symfony Flex](https://github.com/symfony/flex) legt das Recipe die Konfigurationsdateien und die Variable `GUARDED_CHAT_ENABLED` an. Die Plattform selbst konfigurierst du wie in der [Symfony-AI-Dokumentation](https://github.com/symfony/ai) beschrieben, zum Beispiel mit der Generic-Bridge für ein OpenAI-kompatibles Gateway wie LiteLLM:
 
 ```yaml

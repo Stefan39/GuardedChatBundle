@@ -10,7 +10,8 @@
         "chat",
         "guardrails",
         "llm",
-        "rate-limit"
+        "rate-limit",
+        "symfony-ux"
     ],
     "homepage": "https://github.com/Stefan39/GuardedChatBundle",
     "authors": [
