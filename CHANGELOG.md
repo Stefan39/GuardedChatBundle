@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-25
+
+### Fixed
+- `composer.json` now carries the `symfony-ux` keyword. Without it Symfony Flex dropped the bundle's entry from `assets/controllers.json` on every `composer update`, `require` or `remove`, so the chat widget was no longer loaded. After upgrading from an earlier version, check that the entry is still there and re-add it if needed (see README).
+
 ## [1.1.0] - 2026-10-22
 
 ### Added
@@ -32,7 +37,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Chat widget: Stimulus controller (`assets/`, served by AssetMapper), overridable `@GuardedChat/widget.html.twig` with blocks, default stylesheet driven by CSS custom properties, English and German texts including the Art. 50 AI notice, a `verify` event as the hook for human verification, configurable action buttons.
 - README in English and German with demo GIF, a section on how the bundle relates to Symfony AI, and the Flex recipe sources under `docs/recipe/`.
 
-[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.0...v1.0.1
