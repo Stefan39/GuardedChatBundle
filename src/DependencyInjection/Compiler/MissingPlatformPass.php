@@ -18,7 +18,7 @@ final class MissingPlatformPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $platformId = $container->getParameter('guarded_chat.platform_id');
+        $platformId = $container->getParameterBag()->resolveValue($container->getParameter('guarded_chat.platform_id'));
         \assert(\is_string($platformId));
 
         if ($container->has($platformId)) {

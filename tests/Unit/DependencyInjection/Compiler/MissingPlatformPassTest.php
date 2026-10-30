@@ -24,6 +24,19 @@ final class MissingPlatformPassTest extends TestCase
         self::assertFalse($container->hasDefinition(MissingPlatform::class));
     }
 
+    public function testParameterizedPlatformIdIsResolvedBeforeTheLookup(): void
+    {
+        $container = $this->container();
+        $container->setParameter('app.platform', 'my.platform');
+        $container->setParameter('guarded_chat.platform_id', '%app.platform%');
+        $container->register('my.platform', \stdClass::class);
+
+        (new MissingPlatformPass())->process($container);
+
+        self::assertTrue($container->getParameter('guarded_chat.platform_available'));
+        self::assertFalse($container->hasDefinition(MissingPlatform::class));
+    }
+
     public function testMissingPlatformIsReplacedAndLogged(): void
     {
         $container = $this->container();
