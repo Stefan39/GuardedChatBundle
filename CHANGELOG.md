@@ -5,8 +5,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-10-30
+
 ### Fixed
 - A missing Symfony AI platform service no longer breaks the container: the chat is switched off and the reason is logged. Fresh installs with the recipe boot before a platform is configured.
+
+### Changed
+- README: describes the manual setup until the Flex recipe is merged into symfony/recipes-contrib.
 
 ## [1.1.1] - 2026-10-25
 
@@ -40,7 +45,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 - Chat widget: Stimulus controller (`assets/`, served by AssetMapper), overridable `@GuardedChat/widget.html.twig` with blocks, default stylesheet driven by CSS custom properties, English and German texts including the Art. 50 AI notice, a `verify` event as the hook for human verification, configurable action buttons.
 - README in English and German with demo GIF, a section on how the bundle relates to Symfony AI, and the Flex recipe sources under `docs/recipe/`.
 
-[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Stefan39/GuardedChatBundle/compare/v1.0.1...v1.0.2
