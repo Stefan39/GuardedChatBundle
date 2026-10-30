@@ -60,7 +60,7 @@ That is the whole integration: the widget needs AssetMapper with Symfony UX Stim
 
 If the `@stejac/guarded-chat-bundle` entry in `assets/controllers.json` is missing after a Composer update, you came from a version without the `symfony-ux` keyword (before v1.1.1), and Flex removed the entry. Re-add it by hand, or run `composer update stejac/guarded-chat-bundle` once the release with the keyword is installed; from then on Flex keeps the entry.
 
-With [Symfony Flex](https://github.com/symfony/flex) the recipe adds the config files and an `GUARDED_CHAT_ENABLED` variable for you. For the platform itself see the [Symfony AI documentation](https://github.com/symfony/ai), for example the generic bridge for an OpenAI-compatible gateway such as LiteLLM:
+The [Symfony Flex](https://github.com/symfony/flex) recipe is submitted (symfony/recipes-contrib#2093) but not merged yet. Until then, create the two files from the quick start above yourself; Flex still registers the bundle in `config/bundles.php`. For the platform itself see the [Symfony AI documentation](https://github.com/symfony/ai), for example the generic bridge for an OpenAI-compatible gateway such as LiteLLM:
 
 ```yaml
 # config/packages/ai.yaml
