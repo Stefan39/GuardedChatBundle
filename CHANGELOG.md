@@ -5,6 +5,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+### Fixed
+- A missing Symfony AI platform service no longer breaks the container: the chat is switched off and the reason is logged. Fresh installs with the recipe boot before a platform is configured.
+
 ## [1.1.1] - 2026-10-25
 
 ### Fixed
