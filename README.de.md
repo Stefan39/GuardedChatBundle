@@ -175,6 +175,8 @@ guarded_chat:
     retention: { days: 90, log_level: info }
 ```
 
+Existiert der unter `platform` genannte Service nicht, schaltet sich der Chat ab und es wird eine Meldung geloggt, statt dass der Container nicht kompiliert.
+
 ## Endpunkte
 
 | Route | Zweck |

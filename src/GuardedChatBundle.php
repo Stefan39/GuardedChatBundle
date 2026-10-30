@@ -6,6 +6,7 @@ namespace Stejac\GuardedChatBundle;
 
 use Cron\CronExpression;
 use Psr\Log\LogLevel;
+use Stejac\GuardedChatBundle\DependencyInjection\Compiler\MissingPlatformPass;
 use Stejac\GuardedChatBundle\Guard\AlwaysOnRuntimeSwitch;
 use Stejac\GuardedChatBundle\Guard\BudgetExhaustionDetectorInterface;
 use Stejac\GuardedChatBundle\Guard\ChatRuntimeSwitchInterface;
@@ -24,6 +25,7 @@ use Stejac\GuardedChatBundle\Twig\GuardedChatExtension;
 use Symfony\AI\Agent\Agent;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -72,6 +74,13 @@ final class GuardedChatBundle extends AbstractBundle
         'client_identifier_resolver' => [ClientIdentifierResolverInterface::class, RequestClientIdentifierResolver::class],
         'budget_exhaustion_detector' => [BudgetExhaustionDetectorInterface::class, RateLimitBudgetExhaustionDetector::class],
     ];
+
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new MissingPlatformPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+    }
 
     public function configure(DefinitionConfigurator $definition): void
     {
@@ -161,6 +170,8 @@ final class GuardedChatBundle extends AbstractBundle
     {
         $parameters = $container->parameters();
         $parameters->set('guarded_chat.enabled', $config['enabled']);
+        $parameters->set('guarded_chat.platform_id', $config['platform']);
+        $parameters->set('guarded_chat.platform_available', true);
         $parameters->set('guarded_chat.model', $config['model']);
         $parameters->set('guarded_chat.max_output_tokens', $config['max_output_tokens']);
         $parameters->set('guarded_chat.max_message_length', $config['max_message_length']);

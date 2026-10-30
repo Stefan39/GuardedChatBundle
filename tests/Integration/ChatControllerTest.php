@@ -188,6 +188,15 @@ final class ChatControllerTest extends KernelTestCase
         self::assertSame(404, $client->getResponse()->getStatusCode());
     }
 
+    public function testMissingPlatformTurnsTheChatOffLikeTheHardSwitch(): void
+    {
+        $client = $this->client(['platform' => 'test.missing_platform']);
+
+        $this->post($client, '/chat/session', []);
+
+        self::assertSame(404, $client->getResponse()->getStatusCode());
+    }
+
     public function testRuntimeSwitchTurnsTheChatOffWithoutADeploy(): void
     {
         $client = $this->client(['runtime_switch' => 'test.off_switch'], static function (ContainerBuilder $builder): void {

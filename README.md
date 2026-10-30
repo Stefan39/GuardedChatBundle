@@ -175,6 +175,8 @@ guarded_chat:
     retention: { days: 90, log_level: info }
 ```
 
+If the service named in `platform` does not exist, the chat is switched off and a message is logged instead of the container failing to compile.
+
 ## Endpoints
 
 | Route | Purpose |

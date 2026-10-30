@@ -17,6 +17,23 @@ final class ChatAvailabilityTest extends TestCase
         self::assertFalse($this->availability(false, true)->isEnabled());
     }
 
+    public function testMissingPlatformSwitchesTheChatOffByConfiguration(): void
+    {
+        $availability = $this->availability(true, true, false);
+
+        self::assertFalse($availability->isEnabledByConfiguration());
+        self::assertFalse($availability->isEnabled());
+    }
+
+    public function testAvailablePlatformKeepsTheResults(): void
+    {
+        $availability = $this->availability(true, true, true);
+
+        self::assertTrue($availability->isEnabledByConfiguration());
+        self::assertTrue($availability->isEnabled());
+        self::assertFalse($this->availability(false, true, true)->isEnabledByConfiguration());
+    }
+
     public function testStagesCanBeReadSeparately(): void
     {
         $availability = $this->availability(true, false);
@@ -37,7 +54,7 @@ final class ChatAvailabilityTest extends TestCase
                 return true;
             }
         };
-        $availability = new ChatAvailability($switch, true);
+        $availability = new ChatAvailability($switch, true, true);
 
         $availability->isEnabled();
         $availability->isEnabled();
@@ -46,7 +63,7 @@ final class ChatAvailabilityTest extends TestCase
         self::assertSame(1, $switch->calls);
     }
 
-    private function availability(bool $configured, bool $runtime): ChatAvailability
+    private function availability(bool $configured, bool $runtime, bool $platformAvailable = true): ChatAvailability
     {
         return new ChatAvailability(new class($runtime) implements ChatRuntimeSwitchInterface {
             public function __construct(private readonly bool $on)
@@ -57,6 +74,6 @@ final class ChatAvailabilityTest extends TestCase
             {
                 return $this->on;
             }
-        }, $configured);
+        }, $configured, $platformAvailable);
     }
 }

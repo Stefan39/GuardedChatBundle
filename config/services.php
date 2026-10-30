@@ -58,6 +58,7 @@ return static function (ContainerConfigurator $container): void {
     $services->set(ChatAvailability::class)->args([
         service(Stejac\GuardedChatBundle\Guard\ChatRuntimeSwitchInterface::class),
         param('guarded_chat.enabled'),
+        param('guarded_chat.platform_available'),
     ]);
     $services->set(ChatPromptProvider::class)->args([
         service(ChatPromptRepository::class),

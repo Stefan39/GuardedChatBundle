@@ -8,7 +8,8 @@ use Stejac\GuardedChatBundle\Guard\ChatRuntimeSwitchInterface;
 
 /**
  * Single source of truth for whether the public chat is live. Two stages: the `guarded_chat.enabled`
- * configuration is the hard off-switch that survives a broken database, the runtime switch is the
+ * configuration is the hard off-switch that survives a broken database (a missing platform service
+ * counts as off, too), the runtime switch is the
  * kill switch an operator can flip without a deploy.
  */
 final class ChatAvailability
@@ -20,17 +21,18 @@ final class ChatAvailability
     public function __construct(
         private readonly ChatRuntimeSwitchInterface $runtimeSwitch,
         private readonly bool $enabled,
+        private readonly bool $platformAvailable,
     ) {
     }
 
     public function isEnabled(): bool
     {
-        return $this->enabled && $this->isEnabledAtRuntime();
+        return $this->isEnabledByConfiguration() && $this->isEnabledAtRuntime();
     }
 
     public function isEnabledByConfiguration(): bool
     {
-        return $this->enabled;
+        return $this->enabled && $this->platformAvailable;
     }
 
     public function isEnabledAtRuntime(): bool
