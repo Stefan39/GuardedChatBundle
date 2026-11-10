@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installs the bundle into a fresh Flex skeleton and checks that it boots, the way a new user would.
 #
-#   tests/install/run.sh 7.4   # or 8.0
+#   tests/install/run.sh 7.4   # or 8.1
 #
 # The bundle comes from this checkout (as version 1.0.99). The recipe is applied by hand from
 # docs/recipe/ because a recipe in symfony/recipes-contrib is only available after it has been merged.

@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        symfony: ['7.4', '8.0']
+        symfony: ['7.4', '8.1']
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
