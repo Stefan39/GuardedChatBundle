@@ -60,7 +60,11 @@ That is the whole integration: the widget needs AssetMapper with Symfony UX Stim
 
 If the `@stejac/guarded-chat-bundle` entry in `assets/controllers.json` is missing after a Composer update, you came from a version without the `symfony-ux` keyword (before v1.1.1), and Flex removed the entry. Re-add it by hand, or run `composer update stejac/guarded-chat-bundle` once the release with the keyword is installed; from then on Flex keeps the entry.
 
-The [Symfony Flex](https://github.com/symfony/flex) recipe is submitted (symfony/recipes-contrib#2093) but not merged yet. Until then, create the two files from the quick start above yourself; Flex still registers the bundle in `config/bundles.php`. For the platform itself see the [Symfony AI documentation](https://github.com/symfony/ai), for example the generic bridge for an OpenAI-compatible gateway such as LiteLLM:
+With [Symfony Flex](https://github.com/symfony/flex) the bundle's recipe (in `symfony/recipes-contrib`, [#2093](https://github.com/symfony/recipes-contrib/pull/2093)) does the setup for you. Because it comes from the community "contrib" repository, Flex asks once whether to execute it during `composer require`: answer `y` (or `a`/`p` to be asked less often). The recipe registers the bundle in `config/bundles.php`, creates `config/packages/guarded_chat.yaml` and `config/routes/guarded_chat.yaml` with placeholder values, and adds `GUARDED_CHAT_ENABLED=1` to `.env` (set it to `0` to switch the public chat off with a deploy). Then adjust `platform`, `model` and the default prompt in the generated file.
+
+Without the recipe, do these steps yourself: no Flex, an answer of `n`, or a non-interactive install such as a CI or Docker build without `extra.symfony.allow-contrib` in `composer.json` (Flex then skips the recipe and changes nothing, not even `config/bundles.php`). Register `Stejac\GuardedChatBundle\GuardedChatBundle::class => ['all' => true]` in `config/bundles.php` and create the two files from the quick start above.
+
+For the platform itself see the [Symfony AI documentation](https://github.com/symfony/ai), for example the generic bridge for an OpenAI-compatible gateway such as LiteLLM:
 
 ```yaml
 # config/packages/ai.yaml
